@@ -1,0 +1,32 @@
+{
+    "name": "superpms/framework",
+    "license": "Apache-2.0",
+    "description": "pms framework",
+    "autoload": {
+        "files": [
+            "src/helper.php"
+        ],
+        "psr-4": {
+            "pms\\": "src/pms/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Guest",
+            "email": "kid666@88.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "superpms/pms-helper": "^1.0",
+        "superpms/pms-redis": "^1.0",
+        "superpms/pms-database": "^1.0",
+        "symfony/var-dumper": "6.4.*"
+    },
+    "require-dev": {
+        "swoole/ide-helper": "dev-master"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
