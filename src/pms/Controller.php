@@ -43,8 +43,7 @@ abstract class Controller implements ApplicationActionInterface
         $this->_return = $data;
     }
 
-
-    public function success(mixed $data, $code = 200, array $other = []): void
+    public function success(mixed $data, $code = 200, array $other = []): mixed
     {
         $this->_return = [
             'data' => $data,
@@ -53,9 +52,10 @@ abstract class Controller implements ApplicationActionInterface
         if(!empty($other)){
             $this->_return['other'] = $other;
         }
+        return $this->_return;
     }
 
-    public function error(mixed $message, $code = 500, array $other = []): void
+    public function error(mixed $message, $code = 500, array $other = []): mixed
     {
         $this->_return = [
             'message' => $message,
@@ -64,7 +64,13 @@ abstract class Controller implements ApplicationActionInterface
         if(!empty($other)){
             $this->_return['other'] = $other;
         }
+        return $this->_return;
     }
 
+    public function return(mixed $message)
+    {
+        $this->_return = $message;
+        return $this->_return;
+    }
 
 }
