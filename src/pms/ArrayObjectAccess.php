@@ -2,15 +2,12 @@
 
 namespace pms;
 
-use ArrayAccess;
-use Iterator;
-use JsonSerializable;
+use pms\contract\ArrayObjectAccessInterface;
 
-class ArrayObjectAccess implements JsonSerializable,Iterator,ArrayAccess
+class ArrayObjectAccess implements ArrayObjectAccessInterface
 {
 
     protected array $data = [];
-    protected int $position = 0;
 
     public function jsonSerialize(): mixed
     {

@@ -62,28 +62,6 @@ class Facade
         }
     }
 
-    /**
-     * 调用类的实例
-     * @access public
-     * @param  string     $class       类名或者标识
-     * @param  array|true $args        变量
-     * @param  bool       $newInstance 是否每次创建新的实例
-     * @return object
-     */
-    public static function make(string $class, $args = [], $newInstance = false)
-    {
-        if (__CLASS__ != static::class) {
-            return self::__callStatic('make', func_get_args());
-        }
-
-        if (true === $args) {
-            // 总是创建新的实例化对象
-            $newInstance = true;
-            $args        = [];
-        }
-
-        return self::createFacade($class, $args, $newInstance);
-    }
 
     // 调用实际类的方法
     public static function __callStatic($method, $params)

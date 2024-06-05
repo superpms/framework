@@ -2,6 +2,7 @@
 
 namespace pms;
 
+use pms\app\inject\http\ResponseInject;
 use pms\contract\ExceptionHandleInterface;
 use pms\exception\AuthException;
 use pms\exception\ClassNotFoundException;
@@ -11,11 +12,8 @@ use pms\exception\MethodException;
 use pms\exception\ParamsException;
 use pms\exception\SystemException;
 use pms\exception\WarningException;
-use pms\inject\Response;
 
-class ExceptionHandle implements ExceptionHandleInterface
-{
-    protected string $contentType = JSON_CONTENT_TYPE;
+class ExceptionHandle implements ExceptionHandleInterface{
 
     /**
      * 状态码
@@ -35,20 +33,13 @@ class ExceptionHandle implements ExceptionHandleInterface
     protected bool $debug;
 
     protected mixed $content;
-    protected Response $response;
+    protected ResponseInject $response;
 
-    public function getContentType(): string
-    {
-        return $this->contentType;
-    }
-
-    public function getContent(): mixed
-    {
+    public function getContent(): mixed{
         return $this->content;
     }
 
-    public function __construct(\Throwable $exception)
-    {
+    public function __construct(\Throwable $exception){
         $this->debug = config('app.debug',false);
         $this->content = $this->handle($exception);
     }

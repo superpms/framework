@@ -1,33 +1,43 @@
 <?php
+
 namespace pms\server;
-use pms\facade\RDb;
-use pms\server\request\HttpSwooleRequest;
-use pms\server\request\SafeParams;
-use pms\server\response\HttpSwooleResponse;
+
+use pms\contract\ServerInterface;
 use pms\facade\Db;
-class HttpSwoole extends Http
-{
+use pms\facade\Path;
+use pms\facade\RDb;
+use pms\server\example\http\swoole\SwooleHttpRequest;
+use pms\server\example\http\swoole\SwooleHttpResponse;
+use pms\server\example\http\swoole\Example;
+use Swoole\Http\Request;
+use Swoole\Http\Response;
+use Swoole\Http\Server;
 
-    protected bool $connectionPool = true;
+class HttpSwoole implements ServerInterface{
 
-    protected array $bind = [
-        'pms\inject\Request' => HttpSwooleRequest::class,
-        'pms\inject\Response' => HttpSwooleResponse::class,
-        'pms\inject\SafeParams' => SafeParams::class,
-    ];
+    protected string $name = 'http-swoole server';
 
-    public function __destruct(){
-        $connector = Db::getInstance();
-        if(!empty($connector)){
-            foreach ($connector as $value){
-                $value->close();
-            }
+    public static function run(){
+        Db::isPool(true);
+        RDb::isPool(true);
+        $host = config('http.swoole.host','127.0.0.1');
+        $port = config('http.swoole.port',9501);
+        $setConfig = config('http.swoole.config',[]);
+        if(!is_array($setConfig)){
+            $setConfig = [];
         }
-        $connector = RDb::getInstance();
-        if(!empty($connector)){
-            foreach ($connector as $value){
-                $value->close();
-            }
-        }
+        $http = new Server($host, $port);
+        $http->set([
+            'log_file' => Path::getRuntime('/swoole.log'),
+            ...$setConfig,
+            'reload_async'=>true,
+        ]);
+        $http->on('request', function (Request $request, Response $response){
+            $request = new SwooleHttpRequest($request);
+            $response = new SwooleHttpResponse($response);
+            (new Example($request,$response))->run();
+        });
+        $http->start();
     }
+
 }

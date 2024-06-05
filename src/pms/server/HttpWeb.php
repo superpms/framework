@@ -1,17 +1,18 @@
 <?php
 
 namespace pms\server;
+use pms\contract\ServerInterface;
+use pms\server\example\http\web\WebHttpRequest;
+use pms\server\example\http\web\WebHttpResponse;
+use pms\server\example\http\web\Example;
 
-use pms\inject\Response;
-use pms\server\request\HttpWebRequest;
-use pms\server\request\SafeParams;
+class HttpWeb implements ServerInterface{
+    protected string $name = 'http-web server';
 
-class HttpWeb extends Http {
+    public static function run(){
+        $request = new WebHttpRequest();
+        $response = new WebHttpResponse();
+        (new Example($request,$response))->run();
+    }
 
-    protected array $instances = [];
-    protected array $bind = [
-        'pms\inject\Request' => HttpWebRequest::class,
-        'pms\inject\Response' => Response::class,
-        'pms\inject\SafeParams' => SafeParams::class,
-    ];
 }

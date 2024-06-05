@@ -6,5 +6,5 @@ namespace pms\annotate;
  * @Annotation
  */
 #[\Attribute] class Inject{
-    public function __construct(string $classname){}
+    public function __construct(string $classname,...$args){}
 }

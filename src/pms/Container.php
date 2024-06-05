@@ -29,7 +29,6 @@ abstract class Container implements ContainerInterface {
         $class = $this->getClass($class);
         $constructArgs = $this->getMethodArgs($class,"__construct",$args);
         $instance = $class->newInstance(...$constructArgs);
-        $className = $class->getName();
         $properties = $class->getProperties();
         foreach ($properties as $property){
             $attrs = $property->getAttributes();
@@ -40,10 +39,11 @@ abstract class Container implements ContainerInterface {
                             $arg = $attr->getArguments();
                             if(count($arg) >= 1){
                                 $name = $attr->getArguments()[0];
-                                try{
-                                    $inject = $this->get($name);
-                                }catch (\Throwable $e){
-                                    throw new InjectException("can't auto Inject(\\$name:class) to $".$property->getName()." property in $className,because it's not in the provider list.",$e);
+                                array_shift($arg);
+                                if($this->has($name)){
+                                    $inject = $this->get($name,$arg);
+                                }else{
+                                    $this->instances[$name] = $inject = $this->invokeClass($name,$arg);
                                 }
                                 $pro = $class->getProperty($property->getName());
                                 $pro->setValue($instance,$inject);
@@ -67,18 +67,16 @@ abstract class Container implements ContainerInterface {
         $parameters = $method->getParameters();
         $arg = [];
         foreach ($parameters as $value){
-            if(isset($args[$value->getName()])){
+            if(isset($args[$value->getPosition()])){
+                $arg[$value->getPosition()] = $args[$value->getPosition()];
+            }else if(isset($args[$value->getName()])){
                 $arg[$value->getPosition()] = $args[$value->getName()];
             }else if($value->hasType()){
                 $type = $value->getType();
                 if(!$type->isBuiltin()){
                     $name = $type->getName();
                     if(!isset($this->instances[$name])){
-                        if(isset($this->bind[$name])){
-                            $this->instances[$name] = $this->invokeClass($name);
-                        }else{
-                            throw new InjectException('inject ('.$name.') is not exists');
-                        }
+                        $this->instances[$name] = $this->invokeClass($name);
                     }
                     $arg[$value->getPosition()] = $this->instances[$name];
                 }else if($value->isDefaultValueAvailable()){
@@ -95,9 +93,9 @@ abstract class Container implements ContainerInterface {
         return $arg;
     }
 
-    public function get($name):mixed{
+    public function get($name,$args=[]):mixed{
         if($this->has($name)){
-            return $this->make($name,$this->args);
+            return $this->make($name,empty($args) ? $this->args : $args);
         }
         throw new ClassNotFoundException($name);
     }

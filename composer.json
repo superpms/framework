@@ -4,7 +4,8 @@
     "description": "pms framework",
     "autoload": {
         "files": [
-            "src/helper.php"
+            "src/helper.php",
+            "stubs/pms-content-type.php"
         ],
         "psr-4": {
             "pms\\": "src/pms/"
@@ -20,11 +21,12 @@
         "php": ">=8.1",
         "superpms/pms-helper": "^1.0",
         "superpms/pms-redis": "^1.0",
-        "superpms/pms-database": "^1.0",
-        "symfony/var-dumper": "6.4.*"
+        "superpms/pms-database": "^1.0"
     },
     "require-dev": {
-        "swoole/ide-helper": "dev-master"
+        "swoole/ide-helper": "dev-master",
+        "symfony/var-dumper": "6.4.*",
+        "ext-fileinfo": "*"
     },
     "config": {
         "sort-packages": true
