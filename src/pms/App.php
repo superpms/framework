@@ -26,6 +26,15 @@ class App {
         if(is_file($userCommon)){
             include_once $userCommon;
         }
+        /**
+         * 加载插件全局方法
+         */
+        foreach (config('--plugins',[]) as $item){
+            $path = Path::getPlugins($item."/common.php");
+            if(is_file($path)){
+                include_once $path;
+            }
+        }
     }
 
     protected function pathInit($rootPath = ""): void{
@@ -46,11 +55,24 @@ class App {
     }
 
     protected function configInit(): void{
+        /**
+         * 加载系统配置
+         */
         Config::init(loadConfig(Path::getConfig()));
+
+        /**
+         * 加载插件注册配置
+         */
+        $plugins = Path::getPlugins("/plugins.php");
+        if(is_file($plugins)){
+            $config = include $plugins;
+            Config::join([
+                "--plugins"=>$config
+            ]);
+        }
     }
 
     protected function phpiniInit(): void{
-        set_error_handler('customErrorHandler');
         date_default_timezone_set(config('app.default_timezone', 'Asia/Shanghai'));
         $debug = config('app.debug',false);
         if(!$debug){

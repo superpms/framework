@@ -27,7 +27,6 @@ class PathManager
     }
 
     protected function convertSeparate(string|array $string): string{
-
         if(is_array($string)){
             $string = join(DIRECTORY_SEPARATOR,$string);
         }

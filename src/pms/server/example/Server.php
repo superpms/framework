@@ -11,6 +11,6 @@ abstract class Server extends Container
     protected string $app = '';
 
     protected function initAppConfig(): void{
-        Config::join(loadConfig(Path::getApp($this->app)));
+        Config::join(loadConfig(Path::getApp($this->app."/config")));
     }
 }

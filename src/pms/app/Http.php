@@ -43,13 +43,4 @@ abstract class Http implements AppInterface
      */
     protected mixed $responseData = null;
 
-    /**
-     * @return mixed|null|void 接口请求入口
-     */
-    public function entry()
-    {
-        return null;
-    }
-
-
 }

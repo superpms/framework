@@ -2,5 +2,9 @@
 
 namespace pms\contract;
 interface AppInterface{
-    public function entry():void;
+    /**
+     * @return mixed|null|void 接口请求入口
+     */
+
+    public function entry();
 }

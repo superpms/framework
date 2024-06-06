@@ -3,7 +3,7 @@
 namespace pms\exception;
 use RuntimeException;
 
-class ParamsException extends RuntimeException
+class RequestParamsException extends RuntimeException
 {
 
     public function __construct(string $message, protected string $type, protected string $field, protected string $desc)

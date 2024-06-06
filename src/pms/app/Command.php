@@ -16,13 +16,13 @@ abstract class Command implements AppInterface
      * 命令描述
      * @var string
      */
-    protected string $desc = "";
+    protected string $description = "";
 
     /**
      * @var array 参数规则验证
      */
     protected array $validate = [];
 
-    public function __construct(protected array $commands){}
+    final public function __construct(protected array $commands){}
 
 }

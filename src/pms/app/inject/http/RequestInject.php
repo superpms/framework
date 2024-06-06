@@ -26,12 +26,7 @@ interface RequestInject {
     public function isAjax(): bool;
     public function isPjax(): bool;
     public function isPost(): bool;
-    public function terminal(): string|null;
-    public function userinfo(): mixed;
-    public function token(): string|null;
-    public function time(): int|null;
-    public function lastTime(): int|null;
-    public function requestTime(): int|null;
-    public function requestToken(): string|null;
     public function method(): string;
+    public function setAttach(string $key,mixed $data):void;
+    public function getAttach(string $key, mixed $default = null):mixed;
 }

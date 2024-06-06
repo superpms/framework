@@ -13,7 +13,7 @@ class Path extends Facade
 {
     protected static function getFacadeClass(): string
     {
-        return 'pms\PathManager';
+        return PathManager::class;
     }
 
 }

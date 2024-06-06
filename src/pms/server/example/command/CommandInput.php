@@ -86,7 +86,7 @@ class CommandInput extends ArrayObjectAccess implements InputInject
         }
     }
 
-    public function getArguments(string $name = null)
+    public function getArgument(string $name = null)
     {
         if(empty($name)){
             return $this->arguments;
@@ -94,7 +94,7 @@ class CommandInput extends ArrayObjectAccess implements InputInject
         return $this->data[$name] ?? null;
     }
 
-    public function getOptions(string $name = null)
+    public function getOption(string $name = null)
     {
         if(empty($name)){
             return $this->options;

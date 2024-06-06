@@ -3,6 +3,7 @@
 namespace pms\server\example\command;
 
 use pms\app\inject\command\InputInject;
+use pms\app\inject\command\OutputInject;
 use pms\contract\AppInterface;
 use pms\server\example\Server;
 
@@ -17,16 +18,12 @@ class Example extends Server
 
     public function run(): void{
         $namespace = $this->command[$this->name];
-
         $class = $this->getClass($namespace);
         $validate = $class->getProperty('validate')->getDefaultValue();
         $input = new CommandInput($validate);
-
-
-
-
         $this->put(InputInject::class,$input);
-        /**
+        $this->put(OutputInject::class,CommandOutput::class);
+         /**
          * @var $obj AppInterface
          */
         $obj = $this->invokeClass($namespace,[

@@ -7,9 +7,8 @@ use pms\contract\ExceptionHandleInterface;
 use pms\exception\AuthException;
 use pms\exception\ClassNotFoundException;
 use pms\exception\FuncNotFoundException;
-use pms\exception\InjectException;
-use pms\exception\MethodException;
-use pms\exception\ParamsException;
+use pms\exception\RequestMethodException;
+use pms\exception\RequestParamsException;
 use pms\exception\SystemException;
 use pms\exception\WarningException;
 
@@ -24,10 +23,8 @@ class ExceptionHandle implements ExceptionHandleInterface{
         WarningException::class => 500,
         ClassNotFoundException::class => 500,
         FuncNotFoundException::class => 500,
-        InjectException::class => 500,
-        AuthException::class => 501,
-        MethodException::class => 502,
-        ParamsException::class => 503,
+        RequestMethodException::class => 502,
+        RequestParamsException::class => 503,
     ];
 
     protected bool $debug;
@@ -35,11 +32,11 @@ class ExceptionHandle implements ExceptionHandleInterface{
     protected mixed $content;
     protected ResponseInject $response;
 
-    public function getContent(): mixed{
+    final public function getContent(): mixed{
         return $this->content;
     }
 
-    public function __construct(\Throwable $exception){
+    final public function __construct(\Throwable $exception){
         $this->debug = config('app.debug',false);
         $this->content = $this->handle($exception);
     }
@@ -49,12 +46,18 @@ class ExceptionHandle implements ExceptionHandleInterface{
             'message' => $exception->getMessage(),
             'code' => $this->handle[get_class($exception)] ?? 500,
         ];
-        if($this->debug){
+        if($this->debug &&
+            (
+                $exception instanceof WarningException
+                || $exception instanceof ClassNotFoundException
+                || $exception instanceof FuncNotFoundException
+            )
+        ){
             $data['file'] = $exception->getFile();
             $data['line'] = $exception->getLine();
             $data['trace'] = $exception->getTraceAsString();
         }
-        if($exception instanceof ParamsException){
+        if($exception instanceof RequestParamsException){
             $data= [
                 ...$data,
                 'field' => $exception->getField(),

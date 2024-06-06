@@ -13,7 +13,7 @@ class Config extends Facade
 {
     protected static function getFacadeClass(): string
     {
-        return 'pms\ConfigManager';
+        return ConfigManager::class;
     }
 
 }

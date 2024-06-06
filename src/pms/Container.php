@@ -6,7 +6,7 @@ namespace pms;
 use pms\annotate\Inject;
 use pms\contract\ContainerInterface;
 use pms\exception\ClassNotFoundException;
-use pms\exception\InjectException;
+use pms\exception\SystemException;
 use ReflectionClass;
 
 abstract class Container implements ContainerInterface {
@@ -82,12 +82,12 @@ abstract class Container implements ContainerInterface {
                 }else if($value->isDefaultValueAvailable()){
                     $arg[$value->getPosition()] = $value->getDefaultValue();
                 }else{
-                    throw new InjectException($className.' method '.$methodName.':can\'t auto inject "'.$value->getName().'" '.'in parameter '.($value->getPosition()+1).",unless you can give it's a default value");
+                    throw new SystemException($className.' method '.$methodName.':can\'t auto inject "'.$value->getName().'" '.'in parameter '.($value->getPosition()+1).",unless you can give it's a default value");
                 }
             }else if($value->isDefaultValueAvailable()){
                 $arg[$value->getPosition()] = $value->getDefaultValue();
             }else{
-                throw new InjectException($className.' method '.$methodName.':can\'t auto inject "'.$value->getName().'" '.'in parameter '.($value->getPosition()+1).",unless you can give it's a default value");
+                throw new SystemException($className.' method '.$methodName.':can\'t auto inject "'.$value->getName().'" '.'in parameter '.($value->getPosition()+1).",unless you can give it's a default value");
             }
         }
         return $arg;
@@ -110,6 +110,10 @@ abstract class Container implements ContainerInterface {
 
     public function make($name,$args=[]):object{
         if(isset($this->instances[$name])){
+            $class = $this->instances[$name];
+            if(is_string($class)){
+                $this->instances[$name] = $this->invokeClass($class,$args);
+            }
             return $this->instances[$name];
         }
         if(isset($this->bind[$name])){

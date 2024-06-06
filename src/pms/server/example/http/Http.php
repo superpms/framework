@@ -20,7 +20,8 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\VarDumper as dumper;
 
-abstract class Http extends Server{
+abstract class Http extends Server
+{
     protected RequestInject $request;
     protected ResponseInject $response;
     protected array $middlewares = [
@@ -28,27 +29,30 @@ abstract class Http extends Server{
     ];
     protected string $contentType = JSON_CONTENT_TYPE;
 
-    public function __construct(RequestInject $request, ResponseInject $response){
+    public function __construct(RequestInject $request, ResponseInject $response)
+    {
         $this->request = $request;
         $this->response = $response;
     }
 
-    public function run(): void{
-        $isIn = $this->inHttpApp();
-        if(!$isIn){
-            $this->sendFile($this->request->pathinfo());
-            return;
-        }
-        $this->initAppConfig();
-        $this->initCors();
-        $isOptions = $this->isOptionsMethod();
-        if($isOptions){
-            return;
-        }
-        $this->putInject();
-        $this->customShutDownHandler();
-        $this->initVarDumper();
+    public function run(): void
+    {
         try {
+            set_error_handler('customErrorHandler');
+            $isIn = $this->inHttpApp();
+            if (!$isIn) {
+                $this->sendFile($this->request->pathinfo());
+                return;
+            }
+            $this->initAppConfig();
+            $this->initCors();
+            $isOptions = $this->isOptionsMethod();
+            if ($isOptions) {
+                return;
+            }
+            $this->putInject();
+            $this->customShutDownHandler();
+            $this->initVarDumper();
             $data = $this->execute($this->getRealPathInfo(), function (ReflectionClass $class, AppInterface $obj) {
                 $contentType = $class->getProperty('contentType');
                 $this->contentType = $contentType->getValue($obj);
@@ -64,15 +68,16 @@ abstract class Http extends Server{
         }
     }
 
-    protected function inHttpApp(): bool{
+    protected function inHttpApp(): bool
+    {
         $pathinfo = $this->request->pathinfo();
         $apps = config('app.apps.http');
-        if(is_string($apps)){
+        if (is_string($apps)) {
             $apps = [$apps];
         }
         $inApp = false;
-        foreach ($apps as $app){
-            if(str_starts_with($pathinfo,'/'.$app)){
+        foreach ($apps as $app) {
+            if (str_starts_with($pathinfo, '/' . $app)) {
                 $inApp = true;
                 $this->app = $app;
                 break;
@@ -101,10 +106,10 @@ abstract class Http extends Server{
     protected function sendFile(string $pathinfo): void
     {
         $filePath = Path::getPublic($pathinfo);
-        if(is_file($filePath)){
+        if (is_file($filePath)) {
             $this->response->header('Content-Type', mime_content_type($filePath));
             $this->response->end(file_get_contents($filePath));
-        }else{
+        } else {
             $this->response->status(404);
         }
     }
@@ -130,7 +135,8 @@ abstract class Http extends Server{
     }
 
 
-    protected function initMiddlewareConfig(): void{
+    protected function initMiddlewareConfig(): void
+    {
         $config = [];
         $middlewarePath = Path::getApp($this->app . "/middleware.php");
         if (file_exists($middlewarePath)) {
@@ -173,7 +179,8 @@ abstract class Http extends Server{
      * @param array $args
      * @return void
      */
-    protected function runMiddleware(array|string $middlewares, array $args): void{
+    protected function runMiddleware(array|string $middlewares, array $args): void
+    {
         if (is_string($middlewares)) {
             $middlewares = [$middlewares];
         }
@@ -194,13 +201,14 @@ abstract class Http extends Server{
         }
     }
 
-    protected function initVarDumper(): void{
+    protected function initVarDumper(): void
+    {
         if (PHP_SAPI === 'cli') {
             $dumper = new HtmlDumper();
             $cloner = new VarCloner();
             $cloner->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
             dumper::setHandler(function ($var, $label = null) use ($dumper, $cloner) {
-                $this->response->header('Content-Type',"text/html");
+                $this->response->header('Content-Type', "text/html");
                 $var = $cloner->cloneVar($var);
                 if (null !== $label) {
                     $var = $var->withContext(['label' => $label]);
@@ -213,20 +221,21 @@ abstract class Http extends Server{
         }
     }
 
-    public function customShutDownHandler(): void{
-        register_shutdown_function(function (){
+    public function customShutDownHandler(): void
+    {
+        register_shutdown_function(function () {
             $error = error_get_last();
-            if(!empty($error)){
+            if (!empty($error)) {
                 if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
                     ob_end_clean();
-                }else{
+                } else {
                     swoole_clear_error();
                 }
-                $this->response->status(500,'Server Error');
-                if(config('app.debug')){
-                    $this->response->header("content-type",$this->contentType);
+                $this->response->status(500, 'Server Error');
+                if (config('app.debug')) {
+                    $this->response->header("content-type", $this->contentType);
                     $this->response->end(json_encode($error));
-                }else{
+                } else {
                     $this->response->end();
                 }
             }
@@ -242,15 +251,19 @@ abstract class Http extends Server{
             JSON_CONTENT_TYPE => json_encode($data, 320),
             JSONP_CONTENT_TYPE => $this->request->get('callback', 'callback') . '(' . json_encode($data) . ')',
             XML_CONTENT_TYPE => Data::arrayToXml($data),
-            default => is_array($data) || is_object($data) ? json_encode($data, 320): $data,
+            default => is_array($data) || is_object($data) ? json_encode($data, 320) : $data,
         };
     }
 
-    protected function execute(string $pathinfo, \Closure $callback = null){
+    protected function execute(string $pathinfo, \Closure $callback = null)
+    {
+
         $namespace = $this->pathinfoToNamespace($pathinfo);
+
         if (!class_exists($namespace)) {
             throw new ClassNotFoundException($namespace);
         }
+
         $this->initMiddlewareConfig();
         $class = $this->middleware($namespace, $callback);
         $obj = $this->invokeClass($class);
@@ -267,7 +280,8 @@ abstract class Http extends Server{
         return $data;
     }
 
-    protected function pathinfoToNamespace(string $pathinfo): string{
+    protected function pathinfoToNamespace(string $pathinfo): string
+    {
         $packageName = config('app.package_name', 'package');
         $pathinfo = str_replace(".", DIRECTORY_SEPARATOR, $pathinfo);
         $pathinfo = str_replace("\\", DIRECTORY_SEPARATOR, $pathinfo);

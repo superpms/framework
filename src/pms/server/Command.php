@@ -1,6 +1,7 @@
 <?php
 
 namespace pms\server;
+use pms\command\PluginInstall;
 use pms\contract\ServerInterface;
 use pms\server\example\command\Example;
 
@@ -9,7 +10,7 @@ class Command implements ServerInterface
     protected string $name = 'command server';
 
     protected static array $command = [
-
+        'plugin-install' => PluginInstall::class
     ];
 
     public static function run(){

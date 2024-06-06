@@ -21,7 +21,7 @@ abstract class HttpRequest implements inject
     protected array $params = [];
     protected string $method;
     protected string $contentType;
-
+    protected array $attach = [];
     public function server(string $name = null, string $default = null): array|string|null{
         if ($name === null) {
             return $this->server;
@@ -58,7 +58,6 @@ abstract class HttpRequest implements inject
         }
         return $this->post[$name] ?? $default;
     }
-
     public function get(string $name = null, string $default = null): array|string|null{
         if ($name === null) {
             return $this->get;
@@ -95,39 +94,18 @@ abstract class HttpRequest implements inject
     public function isPost(): bool{
         return $this->method() === 'POST';
     }
-
     public function method(): string
     {
         return $this->method;
     }
 
-    public function terminal(): string|null
+    public function setAttach(string $key,mixed $data): void
     {
-        return $this->header(config('web.request_header.terminal','x-terminal'));
+        $this->attach[$key] = $data;
     }
-    public function userinfo(): mixed
-    {
-        return (int) $this->header(config('web.request_header.userinfo','x-userinfo'));
-    }
-    public function token(): string|null
-    {
-        return $this->header(config('web.request_header.token','x-token'));
-    }
-    public function time(): int|null
-    {
-        return (int) $this->header(config('web.request_header.time','x-time'));
-    }
-    public function lastTime(): int|null
-    {
-        return (int) $this->header(config('web.request_header.last_time','x-last-time'));
-    }
-    public function requestTime(): int|null
-    {
-        return (int) $this->header(config('web.request_header.request_time','r-request-time'));
-    }
-    public function requestToken(): string|null
-    {
-        return $this->header(config('web.request_header.request_token','r-request-token'));
+
+    public function getAttach(string $key, mixed $default = null):mixed{
+        return $this->attach[$key] ?? $default;
     }
 
     protected function getIsHttps(): bool{
@@ -147,7 +125,6 @@ abstract class HttpRequest implements inject
         }
         return $isHttps;
     }
-
     protected function getIp(): string
     {
         $ipName = config('web.request_header.ip_name', 'x-real-ip');
@@ -167,7 +144,6 @@ abstract class HttpRequest implements inject
         }
         return $ip;
     }
-
     protected function init()
     {
         $this->isHttps = $this->getIsHttps();
@@ -183,7 +159,6 @@ abstract class HttpRequest implements inject
             $pathinfo = substr($pathinfo,0,strpos($pathinfo,"?"));
         }
         $this->pathinfo = $pathinfo;
-
         $this->contentType = $this->header('content-type','text/plain');
         if(strtolower($this->contentType) === 'application/json'){
             $this->input = json_decode($this->input,true);

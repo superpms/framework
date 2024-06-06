@@ -5,8 +5,8 @@ namespace pms\app\inject\command;
 interface InputInject
 {
 
-    public function getArguments(string $name = null);
+    public function getArgument(string $name = null);
 
-    public function getOptions(string $name = null);
+    public function getOption(string $name = null);
 
 }
