@@ -257,9 +257,7 @@ abstract class Http extends Server
 
     protected function execute(string $pathinfo, \Closure $callback = null)
     {
-
         $namespace = $this->pathinfoToNamespace($pathinfo);
-
         if (!class_exists($namespace)) {
             throw new ClassNotFoundException($namespace);
         }
@@ -283,22 +281,20 @@ abstract class Http extends Server
     protected function pathinfoToNamespace(string $pathinfo): string
     {
         $packageName = config('app.package_name', 'package');
-        $pathinfo = str_replace(".", DIRECTORY_SEPARATOR, $pathinfo);
-        $pathinfo = str_replace("\\", DIRECTORY_SEPARATOR, $pathinfo);
-        $pathinfo = str_replace("\\\\", DIRECTORY_SEPARATOR, $pathinfo);
-        $pathinfo = str_replace("//", DIRECTORY_SEPARATOR, $pathinfo);
-        $pathinfo = str_replace("/", DIRECTORY_SEPARATOR, $pathinfo);
-        $pathinfo = trim($pathinfo, DIRECTORY_SEPARATOR);
-        $pathinfo = explode(DIRECTORY_SEPARATOR, $pathinfo);
+        $pathinfo = str_replace(".", "\\", $pathinfo);
+        $pathinfo = str_replace("//", "\\", $pathinfo);
+        $pathinfo = str_replace("/", "\\", $pathinfo);
+        $pathinfo = trim($pathinfo, "\\");
+        $pathinfo = explode("\\", $pathinfo);
         $pathinfo = join(DIRECTORY_SEPARATOR, [
             '',
             'app',
             ...array_slice($pathinfo, 0, 1),
             $packageName,
-            ...array_slice($pathinfo, 2, count($pathinfo) - 3),
+            ...array_slice($pathinfo, 1, count($pathinfo) - 2),
             ucfirst($pathinfo[count($pathinfo) - 1])
         ]);
-        return str_replace(DIRECTORY_SEPARATOR, '\\', $pathinfo);
+        return $pathinfo;
     }
 
 
