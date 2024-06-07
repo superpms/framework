@@ -5,11 +5,15 @@ use pms\app\inject\http\SafeParamsInject as inf;
 use pms\ArrayObjectAccess;
 
 class SafeParams extends ArrayObjectAccess implements inf {
+
     public function __construct(array $params){
         $this->data = $params;
     }
 
-    public function get(string $name, string $default = null):mixed{
+    public function get(string $name = null, string $default = null):mixed{
+        if($name === null){
+            return $this->data;
+        }
         return $this->data[$name] ?? $default;
     }
 

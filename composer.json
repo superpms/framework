@@ -5,7 +5,7 @@
     "autoload": {
         "files": [
             "src/helper.php",
-            "stubs/pms-content-type.php"
+            "stubs/pms-const.php"
         ],
         "psr-4": {
             "pms\\": "src/pms/"
