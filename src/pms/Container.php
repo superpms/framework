@@ -82,12 +82,12 @@ abstract class Container implements ContainerInterface {
                 }else if($value->isDefaultValueAvailable()){
                     $arg[$value->getPosition()] = $value->getDefaultValue();
                 }else{
-                    throw new SystemException($className.' method '.$methodName.':can\'t auto inject "'.$value->getName().'" '.'in parameter '.($value->getPosition()+1).",unless you can give it's a default value");
+                    throw new SystemException($className.' method '.$methodName.':can\'t auto inject "'.$value->getName().'" '.'in parameter '.($value->getPosition()+1).",unless you can give it's a default value",501);
                 }
             }else if($value->isDefaultValueAvailable()){
                 $arg[$value->getPosition()] = $value->getDefaultValue();
             }else{
-                throw new SystemException($className.' method '.$methodName.':can\'t auto inject "'.$value->getName().'" '.'in parameter '.($value->getPosition()+1).",unless you can give it's a default value");
+                throw new SystemException($className.' method '.$methodName.':can\'t auto inject "'.$value->getName().'" '.'in parameter '.($value->getPosition()+1).",unless you can give it's a default value",501);
             }
         }
         return $arg;

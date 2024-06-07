@@ -8,9 +8,9 @@ use pms\contract\AppInterface;
 abstract class Http implements AppInterface
 {
     /**
-     * @var string|array 接口请求类型
+     * @var string|array|int 接口请求类型
      */
-    protected string|array $method = "GET";
+    protected string|array|int $method = METHOD_GET;
 
     /**
      * @var string 响应数据类型

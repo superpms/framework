@@ -1,8 +1,9 @@
 <?php
 
 namespace pms\server;
-use pms\command\PluginInstall;
 use pms\contract\ServerInterface;
+use pms\server\command\PluginInstallCommand;
+use pms\server\command\RunHttpWebServerCommand;
 use pms\server\example\command\Example;
 
 class Command implements ServerInterface
@@ -10,7 +11,8 @@ class Command implements ServerInterface
     protected string $name = 'command server';
 
     protected static array $command = [
-        'plugin-install' => PluginInstall::class
+        'plugin-install' => PluginInstallCommand::class,
+        'run:http-web'=>RunHttpWebServerCommand::class
     ];
 
     public static function run(){

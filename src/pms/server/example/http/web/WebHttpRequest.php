@@ -7,15 +7,21 @@ use pms\server\example\http\HttpRequest;
 class WebHttpRequest extends HttpRequest {
     public function __construct(){
         $this->server = $_SERVER;
-        ksort($this->server);
         $this->header = $this->getAllHeaders();
+        parent::__construct();
+    }
+
+    public function init(): void{
+        ksort($this->server);
         $this->cookie = $_COOKIE;
         $this->get = $_GET;
         $this->post = $_POST;
         $this->files = $_FILES;
         $this->input = file_get_contents("php://input");
-        $this->init();
+        parent::init();
     }
+
+
     private function getAllHeaders(): array{
         $headers = [];
         if (function_exists('getallheaders') && getallheaders() !== false) {

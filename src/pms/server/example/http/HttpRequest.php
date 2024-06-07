@@ -94,8 +94,22 @@ abstract class HttpRequest implements inject
     public function isPost(): bool{
         return $this->method() === 'POST';
     }
-    public function method(): string
-    {
+    public function isGet(): bool{
+        return $this->method() === 'GET';
+    }
+    public function isPut(): bool{
+        return $this->method() === 'PUT';
+    }
+    public function isDelete(): bool{
+        return $this->method() === 'DELETE';
+    }
+    public function isHead(): bool{
+        return $this->method() === 'HEAD';
+    }
+    public function isOptions(): bool{
+        return $this->method() === 'OPTIONS';
+    }
+    public function method(): string{
         return $this->method;
     }
 
@@ -144,24 +158,31 @@ abstract class HttpRequest implements inject
         }
         return $ip;
     }
-    protected function init()
+
+    public function __construct(){
+        $this->method = strtoupper($this->server('request_method'));
+    }
+
+    public function init(): void
     {
         $this->isHttps = $this->getIsHttps();
         $this->ip = $this->getIp();
         $this->host = $this->header('host');
         $this->scheme = $this->isHttps ? "https" : "http";
-        $this->method = strtoupper($this->server('request_method'));
         $pathinfo = $this->server('request_uri');
         if(empty($pathinfo)){
             $pathinfo = "/";
         }
-        if(strpos($pathinfo,"?") !== false){
+        if(str_contains($pathinfo, "?")){
             $pathinfo = substr($pathinfo,0,strpos($pathinfo,"?"));
         }
         $this->pathinfo = $pathinfo;
         $this->contentType = $this->header('content-type','text/plain');
         if(strtolower($this->contentType) === 'application/json'){
-            $this->input = json_decode($this->input,true);
+            $this->post = [
+                ...$this->post,
+                ...json_decode($this->input,true)
+            ];
         }
         $this->params = array_merge($this->get,$this->post,$this->files);
     }

@@ -26,6 +26,11 @@ interface RequestInject {
     public function isAjax(): bool;
     public function isPjax(): bool;
     public function isPost(): bool;
+    public function isGet(): bool;
+    public function isPut(): bool;
+    public function isDelete(): bool;
+    public function isHead(): bool;
+    public function isOptions(): bool;
     public function method(): string;
     public function setAttach(string $key,mixed $data):void;
     public function getAttach(string $key, mixed $default = null):mixed;

@@ -38,17 +38,17 @@ abstract class Http extends Server
     public function run(): void
     {
         try {
+            $this->initAppConfig();
+            $this->initCors();
+            if ($this->request->isOptions()) {
+                $this->response->end();
+                return;
+            }
+            $this->request->init();
             set_error_handler('customErrorHandler');
             $isIn = $this->inHttpApp();
             if (!$isIn) {
                 $this->sendFile($this->request->pathinfo());
-                return;
-            }
-            $this->initAppConfig();
-            $this->initCors();
-            $isOptions = $this->isOptionsMethod();
-            if ($isOptions) {
-                $this->response->end();
                 return;
             }
             $this->putInject();
@@ -97,7 +97,7 @@ abstract class Http extends Server
 
     protected function isOptionsMethod(): bool
     {
-        if ($this->request->method() === 'OPTIONS') {
+        if ($this->request->isOptions()) {
             $this->response->end();
             return true;
         }
@@ -197,7 +197,7 @@ abstract class Http extends Server
                     $obj->callback($this);
                 }
             } else {
-                throw new SystemException("middleware is not found:" . $item);
+                throw new SystemException("middleware is not found:" . $item,503);
             }
         }
     }
@@ -262,7 +262,6 @@ abstract class Http extends Server
         if (!class_exists($namespace)) {
             throw new ClassNotFoundException($namespace);
         }
-
         $this->initMiddlewareConfig();
         $class = $this->middleware($namespace, $callback);
         $obj = $this->invokeClass($class);
@@ -287,7 +286,7 @@ abstract class Http extends Server
         $pathinfo = str_replace("/", "\\", $pathinfo);
         $pathinfo = trim($pathinfo, "\\");
         $pathinfo = explode("\\", $pathinfo);
-        $pathinfo = join(DIRECTORY_SEPARATOR, [
+        $pathinfo = join("\\", [
             '',
             'app',
             ...array_slice($pathinfo, 0, 1),
@@ -298,15 +297,13 @@ abstract class Http extends Server
         return $pathinfo;
     }
 
-
     /**
      * 加载异常处理器
      * @param \Throwable $e
      * @param bool $inUser 是否使用应用内客制化处理器
      * @return void
      */
-    protected function exceptionHandle(\Throwable $e, bool $inUser = true): void
-    {
+    protected function exceptionHandle(\Throwable $e, bool $inUser = true): void{
         try {
             if (!($e instanceof CliModeForcedInterruptException)) {
                 $userHandle = "\\app\\$this->app\\ExceptionHandle";
@@ -320,7 +317,10 @@ abstract class Http extends Server
                  * @var ExceptionHandleInterface $obj
                  */
                 $obj = $this->invokeClass($class, [
-                    'exception' => $e
+                    $e,
+                    function ($code) {
+                        $this->response->status($code);
+                    }
                 ]);
                 $data = $this->contentToString($obj->getContent(), $this->contentType);
                 $this->response->end($data);

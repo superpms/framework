@@ -18,6 +18,7 @@ if (!function_exists('dd')) {
     {
         if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) && !headers_sent()) {
             header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: text/html');
         }
         if (array_key_exists(0, $vars) && 1 === count($vars)) {
             \Symfony\Component\VarDumper\VarDumper::dump($vars[0]);

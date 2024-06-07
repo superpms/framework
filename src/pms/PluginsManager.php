@@ -32,7 +32,7 @@ class PluginsManager{
             $this->plugins = config('--plugins');
         }
         if(!in_array($pluginName,$this->plugins)){
-            throw new SystemException("$pluginName:插件未安装");
+            throw new SystemException("$pluginName:插件未安装",502);
         }
         $path = Path::getPlugins($pluginName."/config.php");
         if(!is_file($path)){

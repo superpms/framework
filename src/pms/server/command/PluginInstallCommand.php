@@ -1,6 +1,6 @@
 <?php
 
-namespace pms\command;
+namespace pms\server\command;
 
 use pms\annotate\Inject;
 use pms\app\Command;
@@ -9,7 +9,7 @@ use pms\app\inject\command\OutputInject;
 use pms\facade\Path;
 use pms\helper\File;
 
-class PluginInstall extends Command
+class PluginInstallCommand extends Command
 {
     protected string $name = "plugin-install";
     protected string $description = "插件安装";

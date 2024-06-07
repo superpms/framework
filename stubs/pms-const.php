@@ -20,11 +20,11 @@ const TERMINAL_COLOR_BLUE = 34;
 const TERMINAL_COLOR_MAGENTA = 35;
 const TERMINAL_COLOR_CYAN = 36;
 
-const METHOD_GET = "GET";
-const METHOD_POST = "POST";
-const METHOD_PUT = "PUT";
-const METHOD_DELETE = "DELETE";
-const METHOD_PATCH = "PATCH";
-const METHOD_HEAD = "HEAD";
+const METHOD_GET = 1;
+const METHOD_POST = 2;
+const METHOD_PUT = 4;
+const METHOD_DELETE = 8;
+const METHOD_PATCH = 16;
+const METHOD_HEAD = 32;
 
 
