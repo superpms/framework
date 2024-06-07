@@ -48,6 +48,7 @@ abstract class Http extends Server
             $this->initCors();
             $isOptions = $this->isOptionsMethod();
             if ($isOptions) {
+                $this->response->end();
                 return;
             }
             $this->putInject();
