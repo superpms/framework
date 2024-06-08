@@ -161,14 +161,6 @@ abstract class HttpRequest implements inject
 
     public function __construct(){
         $this->method = strtoupper($this->server('request_method'));
-    }
-
-    public function init(): void
-    {
-        $this->isHttps = $this->getIsHttps();
-        $this->ip = $this->getIp();
-        $this->host = $this->header('host');
-        $this->scheme = $this->isHttps ? "https" : "http";
         $pathinfo = $this->server('request_uri');
         if(empty($pathinfo)){
             $pathinfo = "/";
@@ -177,8 +169,16 @@ abstract class HttpRequest implements inject
             $pathinfo = substr($pathinfo,0,strpos($pathinfo,"?"));
         }
         $this->pathinfo = $pathinfo;
+    }
+
+    public function init(): void
+    {
+        $this->isHttps = $this->getIsHttps();
+        $this->ip = $this->getIp();
+        $this->host = $this->header('host');
+        $this->scheme = $this->isHttps ? "https" : "http";
         $this->contentType = $this->header('content-type','text/plain');
-        if(strtolower($this->contentType) === 'application/json'){
+        if(strtolower($this->contentType) === 'application/json' && $this->input !== ""){
             $this->post = [
                 ...$this->post,
                 ...json_decode($this->input,true)

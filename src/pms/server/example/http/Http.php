@@ -44,13 +44,13 @@ abstract class Http extends Server
                 $this->response->end();
                 return;
             }
-            $this->request->init();
             set_error_handler('customErrorHandler');
             $isIn = $this->inHttpApp();
             if (!$isIn) {
                 $this->sendFile($this->request->pathinfo());
                 return;
             }
+            $this->request->init();
             $this->putInject();
             $this->customShutDownHandler();
             $this->initVarDumper();
