@@ -162,14 +162,16 @@ abstract class Http extends Server
         $this->contentType = $actionClass->getProperty('contentType')->getDefaultValue();
         // 执行应用全局中间件
         $this->runMiddleware($this->middlewares, [
-            'class' => $actionClass,
-            'request' => $this->request,
+            $actionClass,
+            $this->request,
+            $this->app
         ]);
         // 执行应用独立中间件
         $actionMiddlewares = $actionClass->getProperty('middleware')->getDefaultValue();
         $this->runMiddleware($actionMiddlewares, [
-            'class' => $actionClass,
-            'request' => $this->request,
+            $actionClass,
+            $this->request,
+            $this->app
         ]);
         return $actionClass;
     }
