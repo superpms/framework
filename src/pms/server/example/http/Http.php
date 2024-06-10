@@ -95,15 +95,6 @@ abstract class Http extends Server
         }
     }
 
-    protected function isOptionsMethod(): bool
-    {
-        if ($this->request->isOptions()) {
-            $this->response->end();
-            return true;
-        }
-        return false;
-    }
-
     protected function sendFile(string $pathinfo): void
     {
         $filePath = Path::getPublic($pathinfo);

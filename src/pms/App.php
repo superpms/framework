@@ -2,6 +2,7 @@
 
 namespace pms;
 
+use pms\facade\Cache;
 use pms\facade\Config;
 use pms\facade\Db;
 use pms\facade\Path;
@@ -70,6 +71,11 @@ class App {
                 "--plugins"=>$config
             ]);
         }
+
+        /**
+         * 加载缓存配置
+         */
+        Cache::init(Path::getRuntime('cache'));
     }
 
     protected function phpiniInit(): void{

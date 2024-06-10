@@ -14,6 +14,19 @@ class Driver
     protected string $runtime;
     protected string $public;
     protected string $vendor;
+    protected string $symbol = '';
+    protected string $noSymbol = '';
+    protected string $dSymbol = '';
+    public function __construct(){
+        $this->symbol = DIRECTORY_SEPARATOR;
+        if($this->symbol === '/'){
+            $this->noSymbol = "\\";
+            $this->dSymbol = "/\\\\+/";
+        }else{
+            $this->noSymbol = "/";
+            $this->dSymbol = "/\/+/";
+        }
+    }
 
     /**
      * @param $key
@@ -30,15 +43,16 @@ class Driver
         if($string === ""){
             return "";
         }
+        $dSymbol = "$this->symbol$this->symbol";
         if(is_array($string)){
-            $string = join(DIRECTORY_SEPARATOR,$string);
+            $string = join($this->symbol,$string);
         }
-        $string = str_replace('\\\\', "\\", $string);
-        $string = str_replace('//', "/", $string);
-        if (DIRECTORY_SEPARATOR === '/') {
-            $string = str_replace('\\', DIRECTORY_SEPARATOR, $string);
-        } else {
-            $string = str_replace('/', DIRECTORY_SEPARATOR, $string);
+        if(str_contains($string,$this->noSymbol)){
+            $string = str_replace($this->noSymbol, $this->symbol, $string);
+        }
+        // 正则匹配 连续多个 $this->symbol 替换为一个 $this->symbol
+        if(str_contains($string,$dSymbol)){
+            $string = preg_replace($this->dSymbol, $this->symbol, $string);
         }
         if(!str_starts_with($string,DIRECTORY_SEPARATOR)){
             $string = DIRECTORY_SEPARATOR . $string;
