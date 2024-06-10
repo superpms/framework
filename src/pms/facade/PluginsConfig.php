@@ -2,15 +2,14 @@
 
 namespace pms\facade;
 
-use pms\config\Driver;
 use pms\Facade;
+use pms\server\plugin\Driver;
 
 /**
  * @see Driver
  * @mixin Driver
  */
-class Config extends Facade
-{
+class PluginsConfig extends Facade{
     protected static function getFacadeClass(): string
     {
         return Driver::class;

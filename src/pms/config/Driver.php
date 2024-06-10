@@ -1,10 +1,10 @@
 <?php
 
-namespace pms;
+namespace pms\config;
 
 use pms\helper\Data;
 
-class ConfigManager
+class Driver
 {
     protected array $data = [];
 

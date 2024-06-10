@@ -1,12 +1,12 @@
 <?php
 
-namespace pms;
+namespace pms\server\plugin;
 
 use pms\exception\SystemException;
 use pms\facade\Path;
 use pms\helper\Data;
 
-class PluginsManager{
+class Driver{
 
     protected array $config = [];
 

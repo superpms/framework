@@ -1,8 +1,8 @@
 <?php
 
-namespace pms;
+namespace pms\path;
 
-class PathManager
+class Driver
 {
 
     protected string $server;

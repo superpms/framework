@@ -3,17 +3,17 @@
 namespace pms\facade;
 
 use pms\Facade;
-use pms\PathManager;
+use pms\path\Driver;
 
 /**
- * @see PathManager
- * @mixin PathManager
+ * @see Driver
+ * @mixin Driver
  */
 class Path extends Facade
 {
     protected static function getFacadeClass(): string
     {
-        return PathManager::class;
+        return Driver::class;
     }
 
 }
