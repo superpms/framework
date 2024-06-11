@@ -21,10 +21,10 @@ class Driver
         $this->symbol = DIRECTORY_SEPARATOR;
         if($this->symbol === '/'){
             $this->noSymbol = "\\";
-            $this->dSymbol = "/\\\\+/";
+            $this->dSymbol = "/\/+/";
         }else{
             $this->noSymbol = "/";
-            $this->dSymbol = "/\/+/";
+            $this->dSymbol = "/\\\\+/";
         }
     }
 
