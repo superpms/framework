@@ -4,18 +4,18 @@ namespace pms\app\inject\http;
 
 interface RequestInject {
 
-    public function server(string $name = null, string $default = null): array|string|null;
+    public function server(string $name = null, mixed $default = null): mixed;
 
-    public function header(string $name = null, string $default = null): array|string|null;
+    public function header(string $name = null, mixed $default = null): mixed;
 
-    public function params(string $name = null, string $default = null): array|string|null;
+    public function params(string $name = null, mixed $default = null): mixed;
 
-    public function cookie(string $name = null, string $default = null): array|string|null;
+    public function cookie(string $name = null, mixed $default = null): mixed;
 
-    public function files(string $name = null, string $default = null): array|string|null;
+    public function files(string $name = null, mixed $default = null): mixed;
 
-    public function post(string $name = null, string $default = null): array|string| null;
-    public function get(string $name = null, string $default = null): array|string| null;
+    public function post(string $name = null, mixed $default = null): mixed;
+    public function get(string $name = null, mixed $default = null): mixed;
     public function input(): string;
     public function contentType(): string;
     public function ip(): string;

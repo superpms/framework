@@ -8,6 +8,12 @@ if (!function_exists('config')) {
         return \pms\facade\Config::get($name,$default);
     }
 }
+if (!function_exists('isDev')) {
+    function isDev():bool
+    {
+        return file_exists(Path::getRoot("/dev.lock"));
+    }
+}
 
 function customErrorHandler($errno, $errstr, $errfile, int $errline){
     throw new \pms\exception\WarningException($errno, $errstr, $errfile, $errline);
@@ -43,7 +49,7 @@ function loadConfig(string $configPath,string $ext='.php'): array
         $files = glob($configPath . '/*' . $ext);
     }
     $env = "production";
-    if (file_exists(Path::getRoot("/dev.lock"))) {
+    if (isDev()) {
         $env = "development";
     }
     $environmentPath = $configPath . DIRECTORY_SEPARATOR . $env;

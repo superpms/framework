@@ -88,33 +88,56 @@ class HttpRequestMiddleware extends Middleware
         }
     }
 
+    private function vParams(array $config, array $data): array
+    {
+        $realData = [];
+        foreach ($config as $key => $configItem) {
+            $require = $configItem['require'] ?? false;
+            $datum = null;
+            if (isset($data[$key])) {
+                $datum = $data[$key];
+            } else if (isset($configItem['default'])) {
+                if ($configItem['default'] instanceof \Closure) {
+                    $datum = $configItem['default']();
+                } else {
+                    $datum = $configItem['default'];
+                }
+            }
+            if (Process::realEmpty($datum)) {
+                if ($require) {
+                    $this->paramsException($configItem['des'] ?? ($configItem['desc'] ?? $key), $key, 1);
+                }
+                continue;
+            }
+            if (isset($configItem['transform'])) {
+                if ($configItem['transform'] instanceof \Closure) {
+                    $datum = $configItem['transform']($datum);
+                } else {
+                    $datum = Process::strToAction($configItem['transform'], $datum);
+                }
+            }
+            if (isset($configItem['type'])) {
+                $type = $configItem['type'];
+                if (($type === 'package' || $type === 'pkg')) {
+                    if (isset($configItem['package']) && is_array($configItem['package'])) {
+                        $datum = $this->vParams($configItem['package'], $datum);
+                    }
+                } else {
+                    if (!Process::validType($type, $datum)) {
+                        $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key);
+                    }
+                }
+            }
+            $realData[$key] = $datum;
+        }
+        return $realData;
+    }
+
     private function params(): void
     {
         $config = $this->config['validate'];
         $paramsDta = $this->request->params();
-        $realData = [];
-        foreach ($config as $key => $value) {
-            $itemConfig = $value;
-            $require = $itemConfig['require'] ?? false;
-            $datum = $paramsDta[$key] ?? $itemConfig['default'] ?? '';
-            if (!empty($datum) || (is_numeric($datum) || is_bool($datum))) {
-                if (isset($itemConfig['transform'])) {
-                    $datum = Process::strToAction($itemConfig['transform'], $datum);
-                }
-            }
-            if ($require && Process::realEmpty($datum)) {
-                $this->paramsException($itemConfig['des'] ?? $itemConfig['desc'] ?? $key, $key, 1);
-            } else {
-                if (!Process::realEmpty($datum)) {
-                    $type = $itemConfig['type'] ?? '';
-                    if (!empty($type) && $type !== 'package' && !Process::validType($type, $datum)) {
-                        $this->paramsException($itemConfig['des'] ?? $itemConfig['desc'] ?? $key, $key);
-                    }
-                    $realData[$key] = $datum;
-                }
-            }
-        }
-        $this->realParams = $realData;
+        $this->realParams = $this->vParams($config, $paramsDta);
     }
 
     private function paramsException($desc, $key, $type = 2)

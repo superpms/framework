@@ -22,43 +22,43 @@ abstract class HttpRequest implements inject
     protected string $method;
     protected string $contentType;
     protected array $attach = [];
-    public function server(string $name = null, string $default = null): array|string|null{
+    public function server(string $name = null, mixed $default = null): array|string|null{
         if ($name === null) {
             return $this->server;
         }
         return $this->server[strtoupper($name)]  ?? $this->server[$name] ?? $this->server[strtolower($name)] ?? $default;
     }
-    public function header(string $name = null, string $default = null): array|string|null{
+    public function header(string $name = null, mixed $default = null): array|string|null{
         if ($name === null) {
             return $this->header;
         }
         return $this->header[$name] ?? $this->header[strtolower($name)] ?? $this->header[strtoupper($name)] ?? $default;
     }
-    public function params(string $name = null, string $default = null): array|string|null{
+    public function params(string $name = null, mixed $default = null): mixed{
         if ($name === null) {
             return $this->params;
         }
         return $this->params[$name] ?? $default;
     }
-    public function cookie(string $name = null, string $default = null): array|string|null{
+    public function cookie(string $name = null, mixed $default = null): array|string|null{
         if ($name === null) {
             return $this->cookie;
         }
         return $this->cookie[$name] ?? $default;
     }
-    public function files(string $name = null, string $default = null): array|string|null{
+    public function files(string $name = null, mixed $default = null): mixed{
         if ($name === null) {
             return $this->files;
         }
         return $this->files[$name] ?? $default;
     }
-    public function post(string $name = null, string $default = null): array|string|null{
+    public function post(string $name = null, mixed $default = null): array|string|null{
         if ($name === null) {
             return $this->post;
         }
         return $this->post[$name] ?? $default;
     }
-    public function get(string $name = null, string $default = null): array|string|null{
+    public function get(string $name = null, mixed $default = null): array|string|null{
         if ($name === null) {
             return $this->get;
         }

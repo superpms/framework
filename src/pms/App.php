@@ -95,8 +95,14 @@ class App {
         }
     }
     protected function databaseInit(): void{
-        Db::setConfig(config('database'));
-        RDb::setConfig(config('redis'));
+        $dbConfig = config('database');
+        if($dbConfig !== null){
+            Db::setConfig(config('database'));
+        }
+        $rdbConfig = config('redis');
+        if($rdbConfig !== null){
+            RDb::setConfig(config('redis'));
+        }
     }
 
     protected array $server = [

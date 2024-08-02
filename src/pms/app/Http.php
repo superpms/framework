@@ -18,7 +18,7 @@ abstract class Http implements AppInterface
     protected string $contentType = JSON_CONTENT_TYPE;
 
     /**
-     * @var string 接口名称
+     * @var string 接口描述
      */
     protected string $desc = "";
 
@@ -33,7 +33,7 @@ abstract class Http implements AppInterface
     protected array $validate = [];
 
     /**
-     * @var array|string 应用中间件
+     * @var array|string 接口中间件
      */
     protected array|string $middleware = [];
 
