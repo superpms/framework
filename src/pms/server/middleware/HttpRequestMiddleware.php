@@ -10,11 +10,9 @@ use pms\exception\RequestParamsException;
 use pms\helper\Data;
 use pms\helper\Process;
 use pms\server\example\http\SafeParams;
-
+use ReflectionMethod;
 class HttpRequestMiddleware extends Middleware
 {
-
-    protected array $config;
 
     protected array $realParams = [];
     protected array $bitOr = [
@@ -26,42 +24,60 @@ class HttpRequestMiddleware extends Middleware
         METHOD_HEAD => "HEAD",
     ];
 
-    public function handle(): void
-    {
-        foreach (['method', 'validate'] as $paramKey) {
-            $item = $this->class->getProperty($paramKey);
-            $this->config[$paramKey] = $item->getDefaultValue();
+    /**
+     * @throws \ReflectionException
+     */
+    public function handle(): void{
+        $methodPy = $this->class->getProperty('method');
+        $method = 'GET';
+        if($methodPy->hasDefaultValue()){
+            $method = $methodPy->getDefaultValue();
         }
-        $this->method();
-        $this->params();
+        $this->method($method);
+        $validate = [];
+        $validatePy = $this->class->getProperty('validate');
+        if($validatePy->hasDefaultValue()){
+            $validate = $validatePy->getDefaultValue();
+        }else{
+            $methods = $this->class->getMethods(ReflectionMethod::IS_PROTECTED | ReflectionMethod::IS_STATIC);
+            foreach($methods as $fn){
+                if ($fn->getName() === 'validate') {
+                    $validate = $fn->invoke(null);
+                    if(!is_array($validate)){
+                        $validate = [];
+                    }
+                    break;
+                }
+            }
+        }
+        $this->params($validate);
     }
 
-    private function method(): void
+    private function method($method): void
     {
-        $config = $this->config['method'] ?? 'GET';
-        if (is_string($config)) {
-            $config = strtoupper($config);
-            $config = str_replace(',', '|', $config);
-            $config = explode("|", $config);
-            $config = [...$config];
-        } else if (is_int($config)) {
-            $config = Data::separateBitOr([
+        if (is_string($method)) {
+            $method = strtoupper($method);
+            $method = str_replace(',', '|', $method);
+            $method = explode("|", $method);
+            $method = [...$method];
+        } else if (is_int($method)) {
+            $method = Data::separateBitOr([
                 METHOD_GET,
                 METHOD_POST,
                 METHOD_PUT,
                 METHOD_DELETE,
                 METHOD_PATCH,
                 METHOD_HEAD,
-            ], $config);
-            $config = array_map(function ($v) {
+            ], $method);
+            $method = array_map(function ($v) {
                 return $this->bitOr[$v];
-            }, $config);
-        } else if (is_array($config)) {
-            $config = array_map(function ($v) {
-                if(is_int($v)){
+            }, $method);
+        } else if (is_array($method)) {
+            $method = array_map(function ($v) {
+                if (is_int($v)) {
                     return $this->bitOr[$v] ?? array_map(function ($v) {
                         return $this->bitOr[$v];
-                    },Data::separateBitOr([
+                    }, Data::separateBitOr([
                         METHOD_GET,
                         METHOD_POST,
                         METHOD_PUT,
@@ -69,21 +85,21 @@ class HttpRequestMiddleware extends Middleware
                         METHOD_PATCH,
                         METHOD_HEAD,
                     ], $v));
-                }else{
+                } else {
                     return strtoupper($v);
                 }
-            }, $config);
+            }, $method);
         }
         $current = $this->request->method();
         $real = [];
-        foreach ($config as $v){
-            if(is_array($v)){
-                $real = [...$real,...$v];
-            }else{
+        foreach ($method as $v) {
+            if (is_array($v)) {
+                $real = [...$real, ...$v];
+            } else {
                 $real[] = $v;
             }
         }
-        if (!in_array($current, $config)) {
+        if (!in_array($current, $method)) {
             throw new RequestMethodException("请求类型不正确");
         }
     }
@@ -124,26 +140,46 @@ class HttpRequestMiddleware extends Middleware
                     }
                 } else {
                     if (!Process::validType($type, $datum)) {
-                        $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key);
+                        $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 2);
                     }
                 }
+            }
+            if (isset($configItem['min']) && is_numeric($datum) && $configItem['min'] > $datum) {
+                $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 3, $configItem['min']);
+            }
+            if (isset($configItem['max']) && is_numeric($datum) && $configItem['max'] < $datum) {
+                $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 4, $configItem['max']);
             }
             $realData[$key] = $datum;
         }
         return $realData;
     }
 
-    private function params(): void
+    private function params(array $validate): void
     {
-        $config = $this->config['validate'];
         $paramsDta = $this->request->params();
-        $this->realParams = $this->vParams($config, $paramsDta);
+        $this->realParams = $this->vParams($validate, $paramsDta);
     }
 
-    private function paramsException($desc, $key, $type = 2)
+    private function paramsException($desc, $key, $type, string $val = "")
     {
-        $message = $type === 1 ? "为必填项" : "数据类型不正确";
-        throw new RequestParamsException($desc . $message, $type, $key, $desc);
+        $message = "";
+        switch ($type) {
+            case 1:
+                $message = "为必填项";
+                break;
+            case 2:
+                $message = "数据类型不正确";
+                break;
+            case 3:
+                $message = "不能小于";
+                break;
+            case 4:
+                $message = "不能大于";
+                break;
+        }
+        $message = $message . $val;
+        throw new RequestParamsException($desc . $message, $type, $key, $desc, $val);
     }
 
     public function callback(ContainerInterface &$server): void

@@ -30,7 +30,7 @@ abstract class Http implements AppInterface
     /**
      * @var array 接口参数验证规则
      */
-    protected array $validate = [];
+    protected array $validate;
 
     /**
      * @var array|string 接口中间件

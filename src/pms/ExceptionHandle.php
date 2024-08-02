@@ -73,7 +73,8 @@ class ExceptionHandle implements ExceptionHandleInterface{
                 'code' => 401,
                 'field' => $exception->getField(),
                 'desc' => $exception->getDesc(),
-                'type' => $exception->getType()
+                'type' => $exception->getType(),
+                'val' => $exception->getVal(),
             ];
         }else{
             $data = [
