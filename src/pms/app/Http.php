@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace pms\app;
 
+use pms\app\inject\http\RequestInject;
 use pms\contract\AppInterface;
 
 abstract class Http implements AppInterface
@@ -42,5 +43,15 @@ abstract class Http implements AppInterface
      * @var mixed|null
      */
     protected mixed $responseData = null;
+
+    /**
+     * 动态接口参数验证规则-方法
+     * @param RequestInject|null $request
+     * @return array
+     */
+    protected static function validate(RequestInject|null $request = null): array
+    {
+        return [];
+    }
 
 }

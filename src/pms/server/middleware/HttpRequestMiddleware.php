@@ -11,6 +11,7 @@ use pms\helper\Data;
 use pms\helper\Process;
 use pms\server\example\http\SafeParams;
 use ReflectionMethod;
+
 class HttpRequestMiddleware extends Middleware
 {
 
@@ -27,23 +28,24 @@ class HttpRequestMiddleware extends Middleware
     /**
      * @throws \ReflectionException
      */
-    public function handle(): void{
+    public function handle(): void
+    {
         $methodPy = $this->class->getProperty('method');
         $method = 'GET';
-        if($methodPy->hasDefaultValue()){
+        if ($methodPy->hasDefaultValue()) {
             $method = $methodPy->getDefaultValue();
         }
         $this->method($method);
         $validate = [];
         $validatePy = $this->class->getProperty('validate');
-        if($validatePy->hasDefaultValue()){
+        if ($validatePy->hasDefaultValue()) {
             $validate = $validatePy->getDefaultValue();
-        }else{
+        } else {
             $methods = $this->class->getMethods(ReflectionMethod::IS_PROTECTED | ReflectionMethod::IS_STATIC);
-            foreach($methods as $fn){
+            foreach ($methods as $fn) {
                 if ($fn->getName() === 'validate') {
-                    $validate = $fn->invoke(null);
-                    if(!is_array($validate)){
+                    $validate = $fn->invoke(null,$this->request);
+                    if (!is_array($validate)) {
                         $validate = [];
                     }
                     break;
@@ -110,7 +112,7 @@ class HttpRequestMiddleware extends Middleware
         foreach ($config as $key => $configItem) {
             $require = $configItem['require'] ?? false;
             $datum = null;
-            if (isset($data[$key])) {
+            if (isset($data[$key]) && !Process::realEmpty($data[$key])) {
                 $datum = $data[$key];
             } else if (isset($configItem['default'])) {
                 if ($configItem['default'] instanceof \Closure) {
@@ -134,21 +136,40 @@ class HttpRequestMiddleware extends Middleware
             }
             if (isset($configItem['type'])) {
                 $type = $configItem['type'];
-                if (($type === 'package' || $type === 'pkg')) {
-                    if (isset($configItem['package']) && is_array($configItem['package'])) {
-                        $datum = $this->vParams($configItem['package'], $datum);
-                    }
-                } else {
-                    if (!Process::validType($type, $datum)) {
-                        $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 2);
-                    }
+                switch ($type) {
+                    case 'package':
+                    case 'pkg':
+                        if (isset($configItem['package']) && is_array($configItem['package'])) {
+                            $datum = $this->vParams($configItem['package'], $datum);
+                        }
+                        break;
+                    case 'packages':
+                    case 'pkgs':
+                        if (isset($configItem['package']) && is_array($configItem['package'])) {
+                            $t = [];
+                            foreach ($datum as $item) {
+                                $t[] = $this->vParams($configItem['package'], $item);
+                            }
+                            $datum = $t;
+                        }
+                        break;
+                    case 'enum':
+                        if (isset($configItem['enum']) && is_array($configItem['enum']) && !in_array($datum, $configItem['enum'])) {
+                            $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 5, join("或", $configItem['enum']));
+                        }
+                        break;
+                    default:
+                        if (!Process::validType($type, $datum)) {
+                            $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 2);
+                        }
+                        if (isset($configItem['min']) && is_numeric($datum) && $configItem['min'] > $datum) {
+                            $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 3, $configItem['min']);
+                        }
+                        if (isset($configItem['max']) && is_numeric($datum) && $configItem['max'] < $datum) {
+                            $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 4, $configItem['max']);
+                        }
+                        break;
                 }
-            }
-            if (isset($configItem['min']) && is_numeric($datum) && $configItem['min'] > $datum) {
-                $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 3, $configItem['min']);
-            }
-            if (isset($configItem['max']) && is_numeric($datum) && $configItem['max'] < $datum) {
-                $this->paramsException($configItem['des'] ?? $configItem['desc'] ?? $key, $key, 4, $configItem['max']);
             }
             $realData[$key] = $datum;
         }
@@ -176,6 +197,9 @@ class HttpRequestMiddleware extends Middleware
                 break;
             case 4:
                 $message = "不能大于";
+                break;
+            case 5:
+                $message = "必须为";
                 break;
         }
         $message = $message . $val;
