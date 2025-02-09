@@ -258,6 +258,12 @@ abstract class Http extends Server
         $this->initMiddlewareConfig();
         $class = $this->middleware($namespace, $callback);
         $obj = $this->invokeClass($class);
+        $obj->app = $this->app;
+
+        if(method_exists($obj,'__prepare')) {
+            $obj->__prepare();
+        }
+
         /**
          * @var $obj AppInterface
          */
@@ -267,6 +273,10 @@ abstract class Http extends Server
         }
         if ($callback !== null) {
             $callback($class, $obj);
+        }
+
+        if(method_exists($obj,'__teardown')) {
+            $obj->__teardown();
         }
         return $data;
     }

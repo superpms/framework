@@ -45,6 +45,11 @@ abstract class Http implements AppInterface
     protected mixed $responseData = null;
 
     /**
+     * @var string 当前应用名称
+     */
+    public string $app;
+
+    /**
      * 动态接口参数验证规则-方法
      * @param RequestInject|null $request
      * @return array
@@ -53,5 +58,18 @@ abstract class Http implements AppInterface
     {
         return [];
     }
+
+    /**
+     * entry的前置执行方法，且在当前接口实例化完成之后
+     * @return void
+     */
+    public function __prepare(): void{}
+
+
+    /**
+     * entry的后置执行方法
+     * @return void
+     */
+    public function __teardown(): void{}
 
 }
