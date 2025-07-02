@@ -13,7 +13,6 @@ use pms\exception\SystemException;
 use pms\facade\Path;
 use pms\helper\Data;
 use pms\server\example\Server;
-use pms\server\middleware\HttpRequestMiddleware;
 use ReflectionClass;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -24,9 +23,7 @@ abstract class Http extends Server
 {
     protected RequestInject $request;
     protected ResponseInject $response;
-    protected array $middlewares = [
-        HttpRequestMiddleware::class
-    ];
+    protected array $middlewares = [];
     protected string $contentType = JSON_CONTENT_TYPE;
 
     public function __construct(RequestInject $request, ResponseInject $response)
@@ -38,7 +35,6 @@ abstract class Http extends Server
     public function run(): void
     {
         try {
-            $this->initAppConfig();
             $this->initCors();
             if ($this->request->isOptions()) {
                 $this->response->end();
@@ -52,8 +48,7 @@ abstract class Http extends Server
             }
             $this->request->init();
             $this->putInject();
-            $this->customShutDownHandler();
-            $this->initVarDumper();
+
             $data = $this->execute($this->getRealPathInfo(), function (ReflectionClass $class, AppInterface $obj) {
                 $contentType = $class->getProperty('contentType');
                 $this->contentType = $contentType->getValue($obj);
@@ -87,8 +82,7 @@ abstract class Http extends Server
         return $inApp;
     }
 
-    protected function initCors(): void
-    {
+    protected function initCors(): void{
         $responseHeader = config('http.cors', []);
         foreach ($responseHeader as $key => $value) {
             $this->response->header($key, $value);
@@ -99,10 +93,16 @@ abstract class Http extends Server
     {
         $filePath = Path::getPublic($pathinfo);
         if (is_file($filePath)) {
-            $this->response->header('Content-Type', mime_content_type($filePath));
-            $this->response->end(file_get_contents($filePath));
+            try{
+                $this->response->header('Content-Type', mime_content_type($filePath));
+                $this->response->end(file_get_contents($filePath));
+            }catch (\Throwable $e){
+                $this->response->status(404);
+                $this->response->end();
+            }
         } else {
             $this->response->status(404);
+            $this->response->end();
         }
     }
 
@@ -127,8 +127,7 @@ abstract class Http extends Server
     }
 
 
-    protected function initMiddlewareConfig(): void
-    {
+    protected function initMiddlewareConfig(): void{
         $config = [];
         $middlewarePath = Path::getApp($this->app . "/middleware.php");
         if (file_exists($middlewarePath)) {
@@ -215,26 +214,7 @@ abstract class Http extends Server
         }
     }
 
-    public function customShutDownHandler(): void
-    {
-        register_shutdown_function(function () {
-            $error = error_get_last();
-            if (!empty($error)) {
-                if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
-                    ob_end_clean();
-                } else {
-                    swoole_clear_error();
-                }
-                $this->response->status(500, 'Server Error');
-                if (config('app.debug')) {
-                    $this->response->header("content-type", $this->contentType);
-                    $this->response->end(json_encode($error));
-                } else {
-                    $this->response->end();
-                }
-            }
-        });
-    }
+
 
     protected function contentToString(mixed $data, string $contentType)
     {

@@ -22,7 +22,7 @@ function customErrorHandler($errno, $errstr, $errfile, int $errline){
 if (!function_exists('dd')) {
     function dd(mixed ...$vars):void
     {
-        if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) && !headers_sent()) {
+        if (!isRunningInConsole() && !headers_sent()) {
             header('HTTP/1.1 500 Internal Server Error');
             header('Content-Type: text/html');
         }
@@ -33,11 +33,7 @@ if (!function_exists('dd')) {
                 \Symfony\Component\VarDumper\VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
             }
         }
-        if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) || !defined('SWOOLE_VERSION')) {
-            exit();
-        }else{
-            throw new \pms\exception\CliModeForcedInterruptException('');
-        }
+        exit();
     }
 }
 
@@ -66,4 +62,10 @@ function loadConfig(string $configPath,string $ext='.php'): array
         $config[strtolower($name)] = include $file;
     }
     return $config;
+}
+
+if(!function_exists('isRunningInConsole')){
+    function isRunningInConsole(): bool{
+        return in_array(PHP_SAPI, ['cli', 'phpdbg','embed'], true);
+    }
 }

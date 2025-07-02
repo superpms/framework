@@ -8,10 +8,6 @@ use pms\contract\AppInterface;
 
 abstract class Http implements AppInterface
 {
-    /**
-     * @var string|array|int 接口请求类型
-     */
-    protected string|array|int $method = METHOD_GET;
 
     /**
      * @var string 响应数据类型
@@ -27,11 +23,6 @@ abstract class Http implements AppInterface
      * @var string 接口描述
      */
     protected string $comment = '';
-
-    /**
-     * @var array 接口参数验证规则
-     */
-    protected array $validate;
 
     /**
      * @var array|string 接口中间件

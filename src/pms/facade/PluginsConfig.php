@@ -3,7 +3,7 @@
 namespace pms\facade;
 
 use pms\Facade;
-use pms\server\plugin\Driver;
+use pms\plugin\Driver;
 
 /**
  * @see Driver

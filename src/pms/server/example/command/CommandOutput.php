@@ -103,19 +103,12 @@ class CommandOutput implements OutputInject
                 $maxLength = $length;
             }
         }
-        $maxLength += 8;
-        self::writeLn("|" . str_repeat("-", $maxLength) . "|");
-        self::writeLn("|" . str_repeat(" ", $maxLength) . "|");
+        $maxLength += 10;
+        self::writeLn(str_repeat("-", $maxLength));
         foreach ($array as $value) {
-            $strWidth = mb_strwidth($value);
-            $pattern = "|\033\[[0-9]{1,2}m|";
-            preg_match_all($pattern, $value, $matches);
-            $allColor = join($matches[0]);
-            $strWidth -= mb_strwidth($allColor);
-            self::writeLn("|    " . $value . str_repeat(" ", $maxLength - $strWidth - 4) . "|");
+            self::writeLn("    " . $value );
         }
-        self::writeLn("|" . str_repeat(" ", $maxLength) . "|");
-        self::writeLn("|" . str_repeat("-", $maxLength) . "|");
+        self::writeLn( str_repeat("-", $maxLength));
         foreach ($args as $arg){
             self::writeArrayBlock($arg);
         }

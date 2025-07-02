@@ -51,7 +51,7 @@ class RunHttpWebServerCommand extends Command
             escapeshellarg($root . DIRECTORY_SEPARATOR . 'index.php')
         );
         $this->output->writeArrayBlock([
-            $this->output->setBoldStr($this->output->setColorStr(TERMINAL_COLOR_GREEN,"● PHP 内置服务器")),
+            $this->output->setBoldStr($this->output->setColorStr(TERMINAL_COLOR_GREEN,"● PHP 内置服务器(仅用于开发测试)")),
             '服务IP: '.$host,
             '服务端口: '.$port,
             sprintf('服务根目录: %s', $root),

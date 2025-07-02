@@ -62,20 +62,6 @@ class ExceptionHandle implements ExceptionHandleInterface{
                 $data['line'] = $exception->getLine();
                 $data['trace'] = $exception->getTrace();
             }
-        }else if ($exception instanceof RequestMethodException){
-            $data = [
-                'message' => $exception->getMessage(),
-                'code' => 400,
-            ];
-        }else if($exception instanceof RequestParamsException){
-            $data= [
-                'message' => $exception->getMessage(),
-                'code' => 401,
-                'field' => $exception->getField(),
-                'desc' => $exception->getDesc(),
-                'type' => $exception->getType(),
-                'val' => $exception->getVal(),
-            ];
         }else{
             $data = [
                 'message' => $exception->getMessage(),

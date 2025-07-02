@@ -12,7 +12,23 @@ class HttpWeb implements ServerInterface{
     public static function run(){
         $request = new WebHttpRequest();
         $response = new WebHttpResponse();
+        self::customShutDownHandler($response);
         (new Example($request,$response))->run();
     }
 
+    public static function customShutDownHandler($response): void{
+        register_shutdown_function(function ()use($response) {
+            $error = error_get_last();
+            if (!empty($error)) {
+                ob_end_clean();
+                $response->status(500, 'Server Error');
+                if (config('app.debug')) {
+                    $response->header("content-type", JSON_CONTENT_TYPE);
+                    $response->end(json_encode($error));
+                } else {
+                    $response->end();
+                }
+            }
+        });
+    }
 }

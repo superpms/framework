@@ -179,10 +179,16 @@ abstract class HttpRequest implements inject
         $this->scheme = $this->isHttps ? "https" : "http";
         $this->contentType = $this->header('content-type','text/plain');
         if(strtolower($this->contentType) === 'application/json' && $this->input !== ""){
-            $this->post = [
-                ...$this->post,
-                ...json_decode($this->input,true)
-            ];
+            try{
+                $this->post = [
+                    ...$this->post,
+                    ...json_decode($this->input,true)
+                ];
+            }catch (\Throwable $e){
+                $this->post = [
+                    ...$this->post,
+                ];
+            }
         }
         $this->params = array_merge($this->get,$this->post,$this->files);
     }

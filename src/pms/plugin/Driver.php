@@ -1,6 +1,6 @@
 <?php
 
-namespace pms\server\plugin;
+namespace pms\plugin;
 
 use pms\exception\SystemException;
 use pms\facade\Path;
