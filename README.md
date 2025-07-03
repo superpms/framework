@@ -1,15 +1,15 @@
-pmsphp 1.0
+pmsphp 2.0
 ===============
 一个新型php api 应用框架
 
 # 特性
-* 基于PHP `8.0+`开发
-* `swoole` 服务基于 `5.0.0+`
-* 数据库操作 基于 `think-orm` `3.0` 版本
+* 基于PHP `8.1+`开发
+* `swoole` 服务基于 `6.0.0+`
+* 数据库操作 基于 `think-orm` `4.0` 版本
 * 支持 `swoole` Mysql 连接池
 * 支持 `swoole` Redis 连接池
 
-> 框架允许环境要求 `php` `8.1.0+` 
+> 框架允许环境要求 `php` `8.1.0+`
 
 # 文档
 还在编写中，敬请期待...
@@ -31,7 +31,7 @@ swoole-cli http.php
 或使用
 ```bash
 cd pms
-composer run dev:win:http-swoole
+composer run http-swoole:swoole-cli
 ```
 ---
 
@@ -44,14 +44,8 @@ php http.php
 或使用
 ```bash
 cd pms
-composer run dev:linux:http-swoole
+composer run http-swoole:php
 ```
-或
-```bash
-cd pms
-composer run dev:mac:http-swoole
-```
-
 
 ## 以 `php` 内置web服务器 启动 `http` 服务
 ```bash
@@ -61,8 +55,36 @@ php -S 0.0.0.0:8080 -t public
 或使用
 ```bash
 cd pms
-composer run dev:http
+php pms run:http-web
 ```
+或使用
+```bash
+cd pms
+composer run http:dev
+```
+
+# 启动 Newsletter 服务
+#### 初始项目提供示例工程
+```bash
+cd pms
+composer newsletter-swoole:newsletter_test_project:swoole-cli
+```
+或使用
+```bash
+cd pms
+composer newsletter-swoole:newsletter_test_project:php
+```
+或执行对应命令
+```bash
+swoole-cli newsletter.php newsletter_test_project
+```
+或
+```bash
+php newsletter.php newsletter_test_project
+```
+运行示例工程：Newsletter服务
+
+
 ---
 > 以上启动方式，仅限于 `dev` 环境，在生产环境，请使用 `nginx` 或 `apache` 等 `web` 服务器进行配置或反向代理
 
