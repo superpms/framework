@@ -575,6 +575,9 @@ abstract class Registry
             return false;
         }
         $data = json_decode($data,true);
+        if($data === null){
+            return false;
+        }
         $data = $data['data'] ?? [];
         $saveData = [];
         foreach ($data as $k=>$v){
