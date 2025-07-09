@@ -6,6 +6,7 @@ use pms\annotate\Inject;
 use pms\app\Command;
 use pms\app\inject\command\InputInject;
 use pms\app\inject\command\OutputInject;
+use pms\facade\Db;
 use pms\facade\Path;
 use pms\helper\File;
 
@@ -55,27 +56,67 @@ class PluginInstallCommand extends Command
             $this->output->writeLn("插件名称与安装目录不相符");
             $this->output->end();
         }
-        $config = config('--plugins');
-        $config = [
-            ...$config,
-            $name
-        ];
-        $config = array_unique($config);
-        $epStr = "return [\r\n";
-        foreach ($config as $k => $v){
-            if($k !== 0){
-                $epStr .= ",\r\n";
+        Db::startTrans();
+        try{
+
+            $namespace = static::getNamespace($name);
+            if($namespace !== false){
+                static::runHook($namespace,'install');
             }
-            $epStr .= "    "."'".$v."'";
+
+            $config = config('--plugins');
+            $config = [
+                ...$config,
+                $name
+            ];
+            $config = array_unique($config);
+            $epStr = "return [\r\n";
+            foreach ($config as $k => $v){
+                if($k !== 0){
+                    $epStr .= ",\r\n";
+                }
+                $epStr .= "    "."'".$v."'";
+            }
+            $epStr .= "\r\n];";
+            $configCode =  "<?php\r\n // 当前已安装的插件（用于插件目录下的config.php文件读取） \r\n$epStr\r\n";
+            File::createFile(Path::getPlugins('/plugins.php'),$configCode);
+
+            Db::commit();
+            $this->output->writeArrayBlock([
+                $this->output->setBoldStr($this->output->setColorStr(TERMINAL_COLOR_GREEN,"【插件安装成功】")),
+                $this->output->setBoldStr("插件名称:").$name,
+                $this->output->setBoldStr("插件目录:").Path::getPlugins($name),
+            ]);
+            $this->output->end();
+        }catch (\Throwable $e){
+            Db::rollback();
+            throw $e;
         }
-        $epStr .= "\r\n];";
-        $configCode =  "<?php\r\n // 当前已安装的插件（用于插件目录下的config.php文件读取） \r\n$epStr\r\n";
-        File::createFile(Path::getPlugins('/plugins.php'),$configCode);
-        $this->output->writeArrayBlock([
-            $this->output->setBoldStr($this->output->setColorStr(TERMINAL_COLOR_GREEN,"【插件安装成功】")),
-            $this->output->setBoldStr("插件名称:").$name,
-            $this->output->setBoldStr("插件目录:").Path::getPlugins($name),
-        ]);
-        $this->output->end();
+
     }
+
+    protected static function getNamespace(string $name): string|false{
+        $installFile = Path::getPlugins($name."/Setup.php");
+        if(!is_file($installFile)){
+            return false;
+        }
+        $name = str_replace(".", "\\", $name);
+        $name = str_replace("//", "\\", $name);
+        $pathinfo = str_replace("/", "\\", $name);
+        $name = trim($pathinfo, "\\");
+        $namespace = "\\plugins\\".$name."\\Setup";
+        if(!class_exists($namespace)){
+            return false;
+        }
+        return $namespace;
+    }
+
+    protected static function runHook(string $namespace,string $hookName)
+    {
+        $class = new $namespace();
+        if(method_exists($class,$hookName)){
+            $class->$hookName();
+        }
+    }
+
 }
