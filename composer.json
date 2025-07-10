@@ -2,7 +2,7 @@
     "name": "superpms/framework",
     "license": "Apache-2.0",
     "description": "pms framework",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "autoload": {
         "files": [
             "src/helper.php",
