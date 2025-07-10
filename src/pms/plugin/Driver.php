@@ -12,7 +12,7 @@ class Driver{
 
     protected array $plugins = [];
 
-    public function config(string $pluginName,string $name = null, $default = null){
+    protected function config(string $pluginName,string $name = null, $default = null){
         $config = $this->getPluginConfig($pluginName);
         if ($name === null) {
             return $config;
@@ -21,7 +21,7 @@ class Driver{
         return $data !== null ? $data : $default;
     }
 
-    private function getPluginConfig($class){
+    protected function getPluginConfig($class){
         $pluginName = explode("\\",$class);
         $pluginName = array_slice($pluginName,1,2);
         $pluginName = implode("/",$pluginName);
