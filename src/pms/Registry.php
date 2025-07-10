@@ -10,6 +10,7 @@ abstract class Registry
     protected string $modelClass;
     protected string $defaultCreateParentKey = "ROOT";
     protected array $andWhere = [];
+    protected array $restoreAttachDatum = [];
 
     /**
      * @var self|null
@@ -567,7 +568,7 @@ abstract class Registry
      */
     public function generateBackupStr(string $password=null): string
     {
-        $data = $this->useModel()::select()->toArray();
+        $data = $this->useModel()::where($this->andWhere)->select()->toArray();
         $data = [
             'registry' => $this->version,
             'data' => $data
@@ -615,6 +616,7 @@ abstract class Registry
         foreach ($data as $k=>$v){
             if(isset($v['key']) && isset($v['parent'])){
                 $saveData[] = [
+                    ...$this->restoreAttachDatum,
                     'parent'=>$v['parent'],
                     'name'=>$v['name'],
                     'key'=>$v['key'],
