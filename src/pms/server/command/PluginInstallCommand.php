@@ -15,9 +15,9 @@ class PluginInstallCommand extends Command
     protected string $name = "plugin-install";
     protected string $description = "插件安装";
     protected array $validate = [
-        'name'=>[
-            'type'=>COMMAND_ARGUMENT_TYPE,
-            'des'=>'插件名称',
+        'name' => [
+            'type' => COMMAND_ARGUMENT_TYPE,
+            'des' => '插件名称',
         ]
     ];
 
@@ -26,44 +26,39 @@ class PluginInstallCommand extends Command
 
     #[Inject(OutputInject::class)]
     protected OutputInject $output;
+
     public function entry(){
         $name = $this->input->getArgument('name');
-        if(empty($name)){
+        if (empty($name)) {
             $this->output->writeLn("请输入插件名称");
             $this->output->end();
         }
-        $nameArr = explode('/',$name);
-        if(count($nameArr) !== 2){
+        $nameArr = explode('/', $name);
+        if (count($nameArr) !== 2) {
             $this->output->writeLn("插件名称不正确");
             $this->output->end();
         }
-        $path = Path::getPlugins($name."/plugins.json");
-        if(!is_file($path)){
+        $path = Path::getPlugins($name . "/plugin.json");
+        if (!is_file($path)) {
             $this->output->writeLn("插件目录不存在");
             $this->output->end();
         }
         $info = File::readFile($path);
-        $info = json_decode($info,true);
-        if($info === null || $info === false){
+        $info = json_decode($info, true);
+        if ($info === null || $info === false) {
             $this->output->writeLn("插件信息不正确");
             $this->output->end();
         }
-        if(!isset($info['name'])){
+        if (!isset($info['name'])) {
             $this->output->writeLn("插件信息不正确");
             $this->output->end();
         }
-        if($name !== $info['name']) {
+        if ($name !== $info['name']) {
             $this->output->writeLn("插件名称与安装目录不相符");
             $this->output->end();
         }
-        Db::startTrans();
-        try{
-
-            $namespace = static::getNamespace($name);
-            if($namespace !== false){
-                static::runHook($namespace,'install');
-            }
-
+        $pluginConfigPath = Path::getPlugins($name . "/config.php");
+        if(is_file($pluginConfigPath)){
             $config = config('--plugins');
             $config = [
                 ...$config,
@@ -71,52 +66,24 @@ class PluginInstallCommand extends Command
             ];
             $config = array_unique($config);
             $epStr = "return [\r\n";
-            foreach ($config as $k => $v){
-                if($k !== 0){
+            foreach ($config as $k => $v) {
+                if ($k !== 0) {
                     $epStr .= ",\r\n";
                 }
-                $epStr .= "    "."'".$v."'";
+                $epStr .= "    " . "'" . $v . "'";
             }
             $epStr .= "\r\n];";
-            $configCode =  "<?php\r\n // 当前已安装的插件（用于插件目录下的config.php文件读取） \r\n$epStr\r\n";
-            File::createFile(Path::getPlugins('/plugins.php'),$configCode);
-
-            Db::commit();
-            $this->output->writeArrayBlock([
-                $this->output->setBoldStr($this->output->setColorStr(TERMINAL_COLOR_GREEN,"【插件安装成功】")),
-                $this->output->setBoldStr("插件名称:").$name,
-                $this->output->setBoldStr("插件目录:").Path::getPlugins($name),
-            ]);
-            $this->output->end();
-        }catch (\Throwable $e){
-            Db::rollback();
-            throw $e;
+            $configCode = "<?php\r\n // 当前已安装的插件（用于插件目录下的config.php文件读取） \r\n$epStr\r\n";
+            File::createFile(Path::getPlugins('/plugins.php'), $configCode);
         }
+        $this->output->writeArrayBlock([
+            $this->output->setBoldStr($this->output->setColorStr(TERMINAL_COLOR_GREEN, "【插件安装成功】")),
+            $this->output->setBoldStr("插件名称:") . $name,
+            $this->output->setBoldStr("插件目录:") . Path::getPlugins($name),
+        ]);
+        $this->output->end();
 
     }
 
-    protected static function getNamespace(string $name): string|false{
-        $installFile = Path::getPlugins($name."/Setup.php");
-        if(!is_file($installFile)){
-            return false;
-        }
-        $name = str_replace(".", "\\", $name);
-        $name = str_replace("//", "\\", $name);
-        $pathinfo = str_replace("/", "\\", $name);
-        $name = trim($pathinfo, "\\");
-        $namespace = "\\plugins\\".$name."\\Setup";
-        if(!class_exists($namespace)){
-            return false;
-        }
-        return $namespace;
-    }
-
-    protected static function runHook(string $namespace,string $hookName)
-    {
-        $class = new $namespace();
-        if(method_exists($class,$hookName)){
-            $class->$hookName();
-        }
-    }
 
 }
