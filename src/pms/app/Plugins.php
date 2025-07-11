@@ -7,11 +7,11 @@ use pms\facade\PluginsConfig;
 
 trait Plugins{
 
-    final public static function config(string $name = null, $default = null){
+    final protected static function config(string $name = null, $default = null){
         return PluginsConfig::config(get_called_class(),$name,$default);
     }
 
-    final public static function path($suffix = null): string{
+    final protected static function path($suffix = null): string{
         if(!empty($suffix) && !str_starts_with($suffix,"/")){
             $suffix = "/".$suffix;
         }
