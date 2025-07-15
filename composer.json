@@ -2,7 +2,6 @@
     "name": "superpms/framework",
     "license": "Apache-2.0",
     "description": "pms framework",
-    "version": "2.0.1",
     "autoload": {
         "files": [
             "src/helper.php",
@@ -26,7 +25,7 @@
         "superpms/pms-cache": "^1.0"
     },
     "require-dev": {
-        "swoole/ide-helper": "dev-master",
+        "swoole/ide-helper": "6.*",
         "symfony/var-dumper": "6.4.*",
         "ext-fileinfo": "*"
     },
