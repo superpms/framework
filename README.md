@@ -1,6 +1,6 @@
 pmsphp 2.0
 ===============
-一个新型php api 应用框架
+pms 框架基座
 
 # 特性
 * 基于PHP `8.1+`开发
@@ -16,87 +16,8 @@ pmsphp 2.0
 
 # 安装
 ```bash
-composer create-project superpms/pms pms
+composer require superpms/framework
 ```
-
-# 启动 HTTP 服务
-
-## 以 `swoole` 模式启动 `http` 服务
-### windows 环境启动
-[需要使用 `swoole` 官方提供的 CygWin `swoole-cli` 运行](https://www.swoole.com/download) 如 `swoole-cli-v5.0.3-cygwin-x64.zip` 版本
-```bash
-cd pms
-swoole-cli http.php
-```
-或使用
-```bash
-cd pms
-composer run http-swoole:swoole-cli
-```
----
-
-### linux\mac 环境启动
-[需要安装 对应`php` 版本的 `swoole 5.0+` 扩展](https://pecl.php.net/package/swoole)
-```bash
-cd pms
-php http.php
-```
-或使用
-```bash
-cd pms
-composer run http-swoole:php
-```
-
-## 以 `php` 内置web服务器 启动 `http` 服务
-```bash
-cd pms
-php -S 0.0.0.0:8080 -t public
-```
-或使用
-```bash
-cd pms
-php pms run:http-web
-```
-或使用
-```bash
-cd pms
-composer run http:dev
-```
-
-# 启动 Newsletter 服务
-#### 初始项目提供示例工程
-```bash
-cd pms
-composer newsletter-swoole:newsletter_test_project:swoole-cli
-```
-或使用
-```bash
-cd pms
-composer newsletter-swoole:newsletter_test_project:php
-```
-或执行对应命令
-```bash
-swoole-cli newsletter.php newsletter_test_project
-```
-或
-```bash
-php newsletter.php newsletter_test_project
-```
-运行示例工程：Newsletter服务
-
-
----
-> 以上启动方式，仅限于 `dev` 环境，在生产环境，请使用 `nginx` 或 `apache` 等 `web` 服务器进行配置或反向代理
-
-# 其他安装
-## `php redis`扩展: （选择PHP对应版本进行下载安装）
-### 1、[windows 环境](https://windows.php.net/downloads/pecl/releases/redis/)
-### 2、[linux\mac 环境](https://pecl.php.net/package/redis)
-
-## `redis` 服务器 (选择适合的版本)
-### 1、[windows 环境](https://github.com/MicrosoftArchive/redis/releases)
-### 2、[linux\mac 环境](https://redis.io/download)
-
 
 ## 命名规范
 
