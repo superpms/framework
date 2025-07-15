@@ -1,10 +1,11 @@
 <?php
 
 namespace pms;
+use ArrayAccess;
+use Iterator;
+use JsonSerializable;
 
-use pms\contract\ArrayObjectAccessInterface;
-
-class ArrayObjectAccess implements ArrayObjectAccessInterface
+abstract class ArrayObjectAccess implements JsonSerializable,Iterator,ArrayAccess
 {
 
     protected array $data = [];

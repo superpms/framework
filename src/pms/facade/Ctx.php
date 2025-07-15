@@ -2,14 +2,14 @@
 
 namespace pms\facade;
 
-use pms\core\driver\config\Driver;
+use pms\core\driver\context\Driver;
 use pms\Facade;
 
 /**
  * @see Driver
  * @mixin Driver
  */
-class Config extends Facade
+class Ctx extends Facade
 {
     protected static function getFacadeClass(): string
     {

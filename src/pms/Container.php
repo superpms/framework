@@ -4,17 +4,16 @@ namespace pms;
 
 
 use pms\annotate\Inject;
-use pms\contract\ContainerInterface;
 use pms\exception\ClassNotFoundException;
 use pms\exception\SystemException;
 use ReflectionClass;
 
-abstract class Container implements ContainerInterface {
+abstract class Container{
     protected array $args = [];
     protected array $bind = [];
     protected array $instances = [];
 
-    public function getClass(string|ReflectionClass $class): ReflectionClass
+    protected function getClass(string|ReflectionClass $class): ReflectionClass
     {
         if(is_string($class)){
             try{
@@ -25,7 +24,7 @@ abstract class Container implements ContainerInterface {
         }
         return $class;
     }
-    public function invokeClass(string|ReflectionClass $class,$args=[]):object{
+    protected function invokeClass(string|ReflectionClass $class,$args=[]):object{
         $class = $this->getClass($class);
         $constructArgs = $this->getMethodArgs($class,"__construct",$args);
         $instance = $class->newInstance(...$constructArgs);
@@ -58,7 +57,7 @@ abstract class Container implements ContainerInterface {
         return $instance;
     }
 
-    public function getMethodArgs(\ReflectionClass $class,string $methodName,$args = []): array{
+    protected function getMethodArgs(\ReflectionClass $class,string $methodName,$args = []): array{
         if(!$class->hasMethod($methodName)){
             return [];
         }
