@@ -22,11 +22,11 @@
         "superpms/pms-helper": "^1.0",
         "superpms/pms-redis": "^1.0",
         "superpms/pms-database": "^2.0",
-        "superpms/pms-cache": "^1.0"
+        "superpms/pms-cache": "^1.0",
+        "symfony/var-dumper": "6.4.*"
     },
     "require-dev": {
-        "swoole/ide-helper": "6.*",
-        "symfony/var-dumper": "6.4.*",
+        "swoole/ide-helper": "^6.0.0",
         "ext-fileinfo": "*"
     },
     "config": {
