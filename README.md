@@ -4,10 +4,6 @@ pms 框架基座
 
 # 特性
 * 基于PHP `8.1+`开发
-* `swoole` 服务基于 `6.0.0+`
-* 数据库操作 基于 `think-orm` `4.0` 版本
-* 支持 `swoole` Mysql 连接池
-* 支持 `swoole` Redis 连接池
 
 > 框架允许环境要求 `php` `8.1.0+`
 

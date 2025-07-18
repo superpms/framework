@@ -2,8 +2,8 @@
 
 namespace pms\facade;
 
-use pms\core\driver\config\Driver;
 use pms\Facade;
+use pms\program\config\Driver;
 
 /**
  * @see Driver

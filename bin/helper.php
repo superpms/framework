@@ -1,0 +1,338 @@
+<?php
+
+use pms\facade\Path;
+
+if (!function_exists('dd')) {
+    function dd(mixed ...$vars):void
+    {
+        if (!in_console() && !headers_sent()) {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: text/html');
+        }
+        if (array_key_exists(0, $vars) && 1 === count($vars)) {
+            \Symfony\Component\VarDumper\VarDumper::dump($vars[0]);
+        } else {
+            foreach ($vars as $k => $v) {
+                \Symfony\Component\VarDumper\VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
+            }
+        }
+        if(!in_console()){
+            die;
+        }else{
+            throw new \pms\exception\CliModeForcedInterruptException("die");
+        }
+    }
+}
+
+if (!function_exists('json_validate')) {
+    /**
+     * 判断是否为有效json数据
+     *
+     * @param string $string 数据
+     * @return bool
+     */
+    function json_validate(string $string): bool
+    {
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
+    }
+}
+
+if(!function_exists('in_console')){
+    function in_console(): bool{
+        return in_array(PHP_SAPI, ['cli', 'phpdbg','embed'], true);
+    }
+}
+if(!function_exists('in_swoole')){
+    function in_swoole(): bool{
+        return defined('SWOOLE_VERSION') && SWOOLE_VERSION !== null;
+    }
+}
+
+if (!function_exists('config')) {
+    function config(string $name = null, $default = null)
+    {
+        return \pms\facade\Config::get($name,$default);
+    }
+}
+if (!function_exists('is_dev')) {
+    function is_dev():bool
+    {
+        return file_exists(Path::getRoot("/dev.lock"));
+    }
+}
+
+if(!function_exists('path_join')){
+    function path_join(...$segments): string{
+        $symbol = DIRECTORY_SEPARATOR;
+        $noSymbol = $symbol === '/' ? '\\' : '/';
+        $path = array_map(function ($segment) use ($symbol, $noSymbol) {
+            if (is_array($segment)) {
+                $segment = path_join(...$segment);
+            }
+            return str_replace($noSymbol, $symbol, $segment);
+        }, $segments);
+
+        $parts = explode($symbol, join($symbol, $path));
+        $stack = [];
+
+        foreach ($parts as $key=> $part) {
+            // 忽略空段和当前目录
+            if (($key !== 0 && $part === '') || $part === '.') continue;
+
+            // 处理上级目录
+            if ($part === '..') {
+                if (!empty($stack)) array_pop($stack);
+                continue;
+            }
+
+            $stack[] = $part;
+        }
+        // 重新组合路径
+        return implode($symbol, $stack);
+    }
+}
+if(!function_exists('path_class')){
+    function path_class(string $path): string{
+        $path = str_replace(DIRECTORY_SEPARATOR, '\\', $path);
+        return str_replace('.php', '', $path);
+    }
+}
+
+if(!function_exists('array_chain')){
+    function array_chain(array $data, string $chain, string $chainLevelStr = '.'){
+        $tmp = $data;
+        $fA = explode($chainLevelStr, $chain);
+        for ($i = 0; $i < count($fA); $i++) {
+            $key = $fA[$i];
+            if (isset($tmp[$key])) {
+                $tmp = $tmp[$key];
+            } else {
+                return null;
+            }
+        }
+        return $tmp;
+    }
+}
+if(!function_exists('array_to_xml')){
+    function array_to_xml(array|object $array, string $root = 'root'): bool|string{
+        function arrayToXml($array, &$xml): void{
+            foreach ($array as $key => $value) {
+                if (is_array($value) || is_object($value)) {
+                    if (!is_numeric($key)) {
+                        $subnode = $xml->addChild($key);
+                        arrayToXml($value, $subnode);
+                    } else {
+                        arrayToXml($value, $xml);
+                    }
+                } else {
+                    $xml->addChild($key, $value);
+                }
+            }
+        }
+
+        $xml = new \SimpleXMLElement('<' . $root . '/>');
+        arrayToXml($array, $xml);
+        return $xml->saveXML();
+    }
+}
+
+
+if(!function_exists('load_file_config')){
+    function load_file_config(string|array $filePath): array
+    {
+        if(is_string($filePath)){
+            $filePath = [$filePath];
+        }
+        $config = [];
+        foreach ($filePath as $file) {
+            $name = pathinfo($file, PATHINFO_FILENAME);
+            if (is_file($file)) {
+                $config[strtolower($name)] = include $file;
+            }
+        }
+        return $config;
+    }
+}else{
+    throw new \Exception("PMS 核心函数 load_file_config 被重载");
+}
+
+if(!function_exists('str_to_fn')){
+    function str_to_fn(string|array $fnName, $value): mixed{
+        if(is_array($fnName)){
+            $fnName = join('|',$fnName);
+        }
+        $fnName = strtoupper($fnName);
+        $fnName = str_replace('|', ',', $fnName);
+        $fnName = explode(',', $fnName);
+        foreach ($fnName as $item) {
+            $item = trim($item);
+            switch ($item) {
+                case 'MD5':
+                    $value = md5($value);
+                    break;
+                case 'STRTOTIME':
+                    $value = strtotime($value);
+                    break;
+                case "INT":
+                case "STRTOINT":
+                    $value = intval($value);
+                    break;
+                case "NUMBER":
+                case "STRTONUMBER":
+                    $value = (float)$value;
+                    break;
+                case "DOUBLE":
+                case "STRTODOUBLE":
+                    $value = floatval($value);
+                    break;
+                case "STR":
+                case "STRING":
+                    $value = $value . '';
+                    break;
+                case "TOJSONSTR":
+                case "TOJSONSTRING":
+                    $value = json_encode($value);
+                    break;
+                case "JSONSTRTOARRAY":
+                case "JSONSTRTOARR":
+                case "JSONSTRINGTOARRAY":
+                case "JSONSTRINGTOARR":
+                    if (is_string($value)) {
+                        $value = json_decode($value, true);
+                    }
+                    break;
+                case 'PARSESTR':
+                    if(is_string($value)){
+                        $newValue = [];
+                        parse_str($value, $newValue);
+                        $value = $newValue;
+                    }
+                    break;
+                case 'STRTOUPPER':
+                    if(is_string($value)){
+                        $value = strtoupper($value);
+                    }
+                    break;
+                case 'STRTOLOWER':
+                    if(is_string($value)){
+                        $value = strtolower($value);
+                    }
+                    break;
+            }
+        }
+        return $value;
+    }
+}
+
+if(!function_exists('bit_or')){
+    /**
+     * 分离或运算和值
+     * @param array $keyMap 或运算索引表(所有能进行或运算的原子值集合)[1,2,4,...]
+     * @param int $value 和值(通过索引表中包含的数进行的任意或运算)
+     * @return array
+     */
+    function bit_or(array$keyMap,int $value): array
+    {
+        $result = [];
+        foreach ($keyMap as $v) {
+            if(($value & $v) === $v){
+                $result[] = $v;
+            }
+        }
+        return $result;
+    }
+}
+
+if(!function_exists('valid_datatype_or')){
+    /**
+     * 验证数据类型(或)
+     * @param string|array $type 数据类型(传入数组 或 用 | 分割多个类型)
+     * @param mixed $datum  数据
+     * @return bool
+     */
+    function valid_datatype_or(string|array $type, mixed $datum): bool{
+        try {
+            if(is_array($type)){
+                $type = join('|', $type);
+            }
+            $type = strtoupper($type);
+            $type = str_replace('||', '|', $type);
+            $type = explode('|', $type);
+            foreach ($type as $value) {
+                $default = true;
+                switch ($value) {
+                    case 'INT':
+                        $default = is_integer($datum);
+                        break;
+                    case 'DOUBLE':
+                        $default = is_double($datum);
+                        break;
+                    case 'NUMBER':
+                        $default = !is_string($datum) && is_numeric($datum);
+                        break;
+                    case 'STRING':
+                    case 'STR':
+                        $default = is_string($datum);
+                        break;
+                    case 'ARRAY':
+                    case 'ARR':
+                        $default = is_array($datum);
+                        break;
+                    case 'BOOL':
+                    case 'BOOLEAN':
+                        $default = is_bool($datum);
+                        break;
+                    case 'FILE':
+                        $default = isset($datum['tmp_name']) && is_file($datum['tmp_name']);
+                        break;
+                }
+                if ($default) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+}
+
+if(!function_exists('dir_create')){
+    /**
+     * 创建文件夹
+     * @param string $path 文件夹地址
+     * @param int $permissions 权限, 默认0777
+     * @return bool
+     */
+    function dir_create(string $path, int $permissions = 0777): bool
+    {
+        if (file_exists($path)) {
+            return false;
+        }
+        @mkdir($path, $permissions, true);
+        return true;
+    }
+}
+if(!function_exists('file_create')){
+    /**
+     * 创建文件
+     * @param string $path 文件地址
+     * @param string $data 文件数据
+     * @param string $mode 文件模式, 默认w，可选w,a,,x,
+     * ‘w'：创建文件。如果文件存在则覆盖内容。
+     * ‘a'：创建文件。如果文件存在则追加内容。
+     * ‘x'：创建文件，在文件不存在时才创建。
+     * @return bool
+     */
+    function file_create(string $path, string $data, string $mode = "w"): bool{
+        dir_create(pathinfo($path)['dirname']);
+        $file = fopen($path, $mode);
+        if (!$file) {
+            return false;
+        }
+        fwrite($file, $data);
+        fclose($file);
+        return true;
+    }
+}

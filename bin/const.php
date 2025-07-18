@@ -1,4 +1,5 @@
 <?php
+
 const JSON_CONTENT_TYPE = 'application/json;charset=utf-8';
 const JSONP_CONTENT_TYPE = 'application/javascript;charset=utf-8;';
 const ZIP_CONTENT_TYPE = 'application/zip';

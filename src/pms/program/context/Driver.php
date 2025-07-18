@@ -1,6 +1,6 @@
 <?php
 
-namespace pms\core\driver\context;
+namespace pms\program\context;
 
 class Driver
 {
@@ -13,7 +13,7 @@ class Driver
 
 
     public function __construct(){
-        if (defined('SWOOLE_VERSION') && SWOOLE_VERSION !== null) {
+        if (in_swoole()) {
             $context = \Swoole\Coroutine::getContext(\Swoole\Coroutine::getCid());
             $context['global'] = [];
             $this->setFnc = function (string $key, mixed $value) use ($context) {
