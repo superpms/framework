@@ -15,11 +15,14 @@ class AutoloadHook implements HookInterface
             $filePaths = [$filePaths];
         }
         foreach ($filePaths as $filePath) {
-            if (file_exists($filePath)) {
-                self::$container[] = $filePath;
-            } else {
-                throw new \Exception("file not exists: $filePath");
+            if(is_string($filePath)){
+                if (file_exists($filePath)) {
+                    self::$container[] = $filePath;
+                } else {
+                    throw new \Exception("file not exists: $filePath");
+                }
             }
+
         }
         return false;
     }
