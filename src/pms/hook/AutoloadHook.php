@@ -17,10 +17,12 @@ class AutoloadHook implements HookInterface
         foreach ($filePaths as $filePath) {
             if(is_string($filePath)){
                 if (file_exists($filePath)) {
-                    self::$container[] = $filePath;
+                    static::$container[] = $filePath;
                 } else {
                     throw new \Exception("file not exists: $filePath");
                 }
+            }else if($filePath instanceof \Closure){
+                static::$container[] = $filePath;
             }
 
         }
@@ -29,7 +31,7 @@ class AutoloadHook implements HookInterface
 
     public static function run(): void
     {
-        foreach (self::$container as $filePath) {
+        foreach (static::$container as $filePath) {
             if ($filePath instanceof \Closure) {
                 $filePath();
             } else if (is_string($filePath) && file_exists($filePath)) {
