@@ -77,6 +77,7 @@ class Setup implements LifecycleInterface {
             'runtime' => path_join(static::$rootPath, static::$bootConfig->dir_runtime),
         ]);
         $paths = [
+            Path::getRuntime('/app'),
             Path::getRuntime('/base'),
             Path::getRuntime('/interpreter'),
             Path::getRuntime('/interpreter/pid'),
