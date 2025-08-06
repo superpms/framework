@@ -2,7 +2,7 @@
 
 namespace pms;
 
-abstract class ConfigOptions extends ArrayObjectAccess{
+abstract class CfgOptions extends ArrayObjectAccess{
 
     protected function realName(string $name): string
     {

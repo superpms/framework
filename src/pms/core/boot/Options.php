@@ -1,6 +1,6 @@
 <?php
 namespace pms\core\boot;
-use pms\ConfigOptions;
+use pms\CfgOptions;
 
 
 /**
@@ -15,7 +15,7 @@ use pms\ConfigOptions;
  * @property boolean $log_debug;
  * @property object $php_ini;
  */
-class Options extends ConfigOptions
+class Options extends CfgOptions
 {
 
     public function __construct($boot)
