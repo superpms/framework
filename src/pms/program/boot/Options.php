@@ -1,5 +1,5 @@
 <?php
-namespace pms\core\boot;
+namespace pms\program\boot;
 use pms\CfgOptions;
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace pms\core\boot;
+namespace pms\program\boot;
 
 use pms\contract\LifecycleInterface;
 use pms\facade\Config;

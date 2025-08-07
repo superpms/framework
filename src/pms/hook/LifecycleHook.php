@@ -5,12 +5,12 @@ namespace pms\hook;
 
 use pms\contract\HookInterface;
 use pms\contract\LifecycleInterface;
-use pms\core\boot\Options;
+use pms\program\boot\Options;
 
 class LifecycleHook implements HookInterface{
 
     public static array $container = [
-        \pms\core\boot\Setup::class
+        \pms\program\boot\Setup::class
     ];
 
     public static function mount(string|\Closure $class): bool{

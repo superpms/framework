@@ -1,9 +1,9 @@
 <?php
 
 namespace pms;
-use pms\core\boot\Options;
 use pms\hook\InterpreterHook;
 use pms\hook\LifecycleHook;
+use pms\program\boot\Options;
 
 class Boot
 {
@@ -13,12 +13,6 @@ class Boot
         /**
          * 初始系统引导文件
          */
-        $this->initBootOptions();
-        LifecycleHook::run($this->rootPath,$this->bootOptions);
-    }
-
-
-    protected function initBootOptions(): void{
         $bootFile = path_join($this->rootPath, 'boot.json');
         if (!file_exists($bootFile)) {
             exit("系统引导文件不存在");
@@ -29,10 +23,13 @@ class Boot
         }
         $bootConfig = json_decode($fileContent);
         $this->bootOptions = new Options($bootConfig);
+
+        LifecycleHook::run($this->rootPath,$this->bootOptions);
     }
 
 
+
     public function __get(string $name){
-        InterpreterHook::run($name);
+        InterpreterHook::run($name,$this->bootOptions);
     }
 }

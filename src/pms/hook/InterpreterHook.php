@@ -5,7 +5,7 @@ namespace pms\hook;
 use pms\app\InterpreterApp;
 use pms\contract\HookInterface;
 
-class InterpreterHook  implements HookInterface{
+class InterpreterHook implements HookInterface{
     public static array $container = [];
     public static function mount(string $serverName, string $serverClass): bool{
         if(!isset(static::$container[$serverName])){
@@ -15,7 +15,7 @@ class InterpreterHook  implements HookInterface{
         return false;
     }
 
-    public static function run(string $serverName): mixed{
+    public static function run(string $serverName,\pms\program\boot\Options $bootOptions): mixed{
         if (!isset(static::$container[$serverName])) {
             exit("解释器 [{$serverName}] 未安装");
         }
@@ -23,7 +23,7 @@ class InterpreterHook  implements HookInterface{
          * @var InterpreterApp $server;
          */
         $server = static::$container[$serverName];
-        return $server::run();
+        return $server::run($bootOptions);
     }
 
 }
