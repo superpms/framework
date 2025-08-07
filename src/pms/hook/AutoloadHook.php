@@ -2,7 +2,7 @@
 
 namespace pms\hook;
 
-use pms\core\contract\HookInterface;
+use pms\contract\HookInterface;
 
 class AutoloadHook implements HookInterface
 {

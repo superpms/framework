@@ -2,7 +2,7 @@
 
 namespace pms\app;
 
-use pms\core\contract\InterpreterAppInterface;
+use pms\contract\InterpreterAppInterface;
 
 abstract class InterpreterApp implements InterpreterAppInterface
 {

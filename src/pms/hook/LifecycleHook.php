@@ -3,8 +3,8 @@
 namespace pms\hook;
 
 
-use pms\core\contract\HookInterface;
-use pms\core\contract\LifecycleInterface;
+use pms\contract\HookInterface;
+use pms\contract\LifecycleInterface;
 
 class LifecycleHook implements HookInterface{
 
