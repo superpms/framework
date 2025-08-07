@@ -7,18 +7,18 @@ use pms\hook\LifecycleHook;
 
 class Boot
 {
-    protected Options $bootConfig;
+    protected Options $bootOptions;
 
     public function __construct(protected string $rootPath = ""){
         /**
          * 初始系统引导文件
          */
-        $this->initBootConfig();
-        LifecycleHook::run($this->rootPath);
+        $this->initBootOptions();
+        LifecycleHook::run($this->rootPath,$this->bootOptions);
     }
 
 
-    protected function initBootConfig(): void{
+    protected function initBootOptions(): void{
         $bootFile = path_join($this->rootPath, 'boot.json');
         if (!file_exists($bootFile)) {
             exit("系统引导文件不存在");
@@ -28,7 +28,7 @@ class Boot
             exit("系统引导文件读取错误");
         }
         $bootConfig = json_decode($fileContent);
-        $this->bootConfig = new Options($bootConfig);
+        $this->bootOptions = new Options($bootConfig);
     }
 
 
