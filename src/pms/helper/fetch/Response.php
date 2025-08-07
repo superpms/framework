@@ -6,7 +6,7 @@ class Response{
 
 
     protected array $headers = [];
-    protected array $body = [];
+    protected mixed $body = [];
     protected array $cookie = [];
 
 
@@ -82,7 +82,7 @@ class Response{
 
     public function getJsonBody(bool $toArray = false){
         if (!empty($this->body) && json_validate($this->body)) {
-            $this->body = json_decode($this->body, $toArray);
+            return json_decode($this->body, $toArray);
         }
         return null;
     }

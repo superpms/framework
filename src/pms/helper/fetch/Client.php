@@ -116,7 +116,7 @@ class Client
             if(is_array($header)){
                 $this->options[CURLOPT_HTTPHEADER] = [
                     ...$oldHeader,
-                    $header
+                    ...$header
                 ];
             }
         }else{
@@ -139,7 +139,7 @@ class Client
             if(is_array($cookie)){
                 $this->options[CURLOPT_COOKIE] = [
                     ...$oldCookie,
-                    $cookie
+                    ...$cookie
                 ];
             }
         }else{
