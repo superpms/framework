@@ -67,9 +67,11 @@ class Client
         return $this;
     }
 
-    public function setMethod(string $method){
+    public function setMethod(string $method): static
+    {
         $method = strtoupper($method);
         $this->options[CURLOPT_CUSTOMREQUEST] = $method;
+        return $this;
     }
 
     public function setData(mixed $data){

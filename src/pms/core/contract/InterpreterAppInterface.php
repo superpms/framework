@@ -1,6 +1,6 @@
 <?php
 
-namespace pms\contract;
+namespace pms\core\contract;
 interface InterpreterAppInterface{
 
     /**

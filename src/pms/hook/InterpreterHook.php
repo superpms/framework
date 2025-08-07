@@ -3,7 +3,7 @@
 namespace pms\hook;
 
 use pms\app\InterpreterApp;
-use pms\contract\HookInterface;
+use pms\core\contract\HookInterface;
 
 class InterpreterHook  implements HookInterface{
     public static array $container = [];

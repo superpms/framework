@@ -2,7 +2,7 @@
 
 namespace pms\core\boot;
 
-use pms\contract\LifecycleInterface;
+use pms\core\contract\LifecycleInterface;
 use pms\facade\Config;
 use pms\facade\Path;
 use pms\hook\AutoloadHook;
