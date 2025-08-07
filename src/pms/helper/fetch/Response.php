@@ -4,10 +4,9 @@ namespace pms\helper\fetch;
 
 class Response{
 
-
-    protected array $headers = [];
-    protected mixed $body = [];
-    protected array $cookie = [];
+    protected array|null $headers = null;
+    protected mixed $body = null;
+    protected array|null $cookie = null;
 
 
     public function __construct(

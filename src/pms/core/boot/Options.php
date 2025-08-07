@@ -14,6 +14,7 @@ use pms\CfgOptions;
  * @property boolean $error_debug;
  * @property boolean $log_debug;
  * @property object $php_ini;
+ * @property object $extend;
  */
 class Options extends CfgOptions
 {
@@ -28,5 +29,6 @@ class Options extends CfgOptions
         $this->error_debug = $boot?->error_debug ?? true;
         $this->log_debug = $boot?->log_debug ?? false;
         $this->php_ini = $boot?->php_ini ?? (object)[];
+        $this->extend = $boot?->extend ?? (object)[];
     }
 }

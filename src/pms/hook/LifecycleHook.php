@@ -5,6 +5,7 @@ namespace pms\hook;
 
 use pms\contract\HookInterface;
 use pms\contract\LifecycleInterface;
+use pms\core\boot\Options;
 
 class LifecycleHook implements HookInterface{
 
@@ -23,15 +24,15 @@ class LifecycleHook implements HookInterface{
         return false;
     }
 
-    public static function run(string $rootPath): void{
+    public static function run(string $rootPath,Options $options): void{
         foreach (self::$container as $class){
             if($class instanceof \Closure){
-                $class($rootPath);
+                $class($rootPath,$options);
             }else{
                 /**
                  * @var $class LifecycleInterface
                  */
-                $class::start($rootPath);
+                $class::start($rootPath,$options);
             }
 
         }

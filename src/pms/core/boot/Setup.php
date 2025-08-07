@@ -9,30 +9,25 @@ use pms\hook\AutoloadHook;
 
 class Setup implements LifecycleInterface {
 
-    protected static Options $bootConfig;
     protected static  string $rootPath;
-    public static function start(string $rootPath): void{
-        static::$rootPath = $rootPath;
 
-        /**
-         * 初始系统引导文件
-         */
-        static::initBootConfig();
+    public static function start(string $rootPath, Options $bootOptions): void{
+        static::$rootPath = $rootPath;
 
         /**
          * 项目级 PHP配置覆盖
          */
-        static::initPhpIni();
+        static::initPhpIni($bootOptions);
 
         /**
          * 初始化路径导航系统
          */
-        static::initPath();
+        static::initPath($bootOptions);
 
         /**
          * 初始化自动导入文件
          */
-        static::initAutoload();
+        static::initAutoload($bootOptions);
 
         /**
          * 初始化系项目配置
@@ -41,40 +36,27 @@ class Setup implements LifecycleInterface {
 
     }
 
-
-    protected static function initBootConfig(): void{
-        $bootFile = path_join(static::$rootPath, 'boot.json');
-        if (!file_exists($bootFile)) {
-            exit("系统引导文件不存在");
-        }
-        $fileContent = file_get_contents($bootFile);
-        if (!json_validate($fileContent)) {
-            exit("系统引导文件读取错误");
-        }
-        $bootConfig = json_decode($fileContent);
-        static::$bootConfig = new Options($bootConfig);
-    }
-    protected static function initPhpIni(): void{
-        date_default_timezone_set(static::$bootConfig->timezone);
-        if (!static::$bootConfig->error_debug) {
+    protected static function initPhpIni(Options $bootOptions): void{
+        date_default_timezone_set($bootOptions->timezone);
+        if (!$bootOptions->error_debug) {
             ini_set('display_errors', 'Off');
         }
-        if (static::$bootConfig->log_debug) {
+        if ($bootOptions->log_debug) {
             ini_set('log_errors', 'On');
             ini_set('error_log', Path::getRuntime('/base/error.log'));
         }
-        foreach (static::$bootConfig->php_ini as $key => $item) {
+        foreach ($bootOptions->php_ini as $key => $item) {
             ini_set($key, $item);
         }
     }
-    protected static function initPath(): void{
+    protected static function initPath(Options $bootOptions): void{
         $vendorPath = realpath(dirname(__DIR__));
         static::$rootPath = static::$rootPath !== "" ? static::$rootPath : rtrim(dirname($vendorPath, 4), DIRECTORY_SEPARATOR);
         Path::init([
             'root' => static::$rootPath,
-            'app' => path_join(static::$rootPath, static::$bootConfig->dir_app),
-            'config' => path_join(static::$rootPath, static::$bootConfig->dir_config),
-            'runtime' => path_join(static::$rootPath, static::$bootConfig->dir_runtime),
+            'app' => path_join(static::$rootPath, $bootOptions->dir_app),
+            'config' => path_join(static::$rootPath, $bootOptions->dir_config),
+            'runtime' => path_join(static::$rootPath, $bootOptions->dir_runtime),
         ]);
         $paths = [
             Path::getRuntime('/app'),
@@ -90,8 +72,8 @@ class Setup implements LifecycleInterface {
         }
     }
 
-    protected static function initAutoload(): void{
-        AutoloadHook::mount(static::$bootConfig->autoload);
+    protected static function initAutoload(Options $bootOptions): void{
+        AutoloadHook::mount($bootOptions->autoload);
         AutoloadHook::run();
     }
 
