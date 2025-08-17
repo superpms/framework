@@ -17,9 +17,9 @@ abstract class HRBClient implements HRBClientInterface
         return $request;
     }
 
-    protected function after(Response $client):mixed
+    protected function after(Response $response):mixed
     {
-        return $client->getJsonBody();
+        return $response->getJsonBody();
     }
 
     public function execute(HRBRequestInterface $request): mixed

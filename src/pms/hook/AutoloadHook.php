@@ -3,6 +3,7 @@
 namespace pms\hook;
 
 use pms\contract\HookInterface;
+use pms\facade\Path;
 
 class AutoloadHook implements HookInterface
 {
@@ -16,9 +17,12 @@ class AutoloadHook implements HookInterface
         }
         foreach ($filePaths as $filePath) {
             if(is_string($filePath)){
-                if (file_exists($filePath)) {
+                $reFilePath = Path::getRoot($filePath);
+                if($reFilePath){
+                    static::$container[] = $reFilePath;
+                }else if (is_file($filePath)) {
                     static::$container[] = $filePath;
-                } else {
+                }else {
                     throw new \Exception("file not exists: $filePath");
                 }
             }else if($filePath instanceof \Closure){
