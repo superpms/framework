@@ -66,6 +66,7 @@ if(!function_exists('path_join')){
     function path_join(...$segments): string{
         $symbol = DIRECTORY_SEPARATOR;
         $noSymbol = $symbol === '/' ? '\\' : '/';
+        $segments = array_filter($segments);
         $path = array_map(function ($segment) use ($symbol, $noSymbol) {
             if (is_array($segment)) {
                 $segment = path_join(...$segment);
