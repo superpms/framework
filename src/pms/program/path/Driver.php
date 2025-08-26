@@ -2,10 +2,10 @@
 
 namespace pms\program\path;
 /**
- * @method static getRoot(string|array $suffix1 = "",...$suffix2);
- * @method static getApp(string|array $suffix1 = "",...$suffix2);
- * @method static getConfig(string|array $suffix1 = "",...$suffix2);
- * @method static getRuntime(string|array $suffix1 = "",...$suffix2);
+ * @method static getRoot(string|array $suffix1 = "",string ...$suffix2);
+ * @method static getApp(string|array $suffix1 = "",string ...$suffix2);
+ * @method static getConfig(string|array $suffix1 = "",string ...$suffix2);
+ * @method static getRuntime(string|array $suffix1 = "",string ...$suffix2);
  */
 class Driver
 {
