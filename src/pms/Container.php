@@ -2,10 +2,10 @@
 
 namespace pms;
 
-
-use pms\annotate\Inject;
 use pms\exception\ClassNotFoundException;
 use pms\exception\SystemException;
+use pms\hook\AnnotationClassHook;
+use pms\hook\AnnotationPropertyHook;
 use ReflectionClass;
 
 abstract class Container{
@@ -18,42 +18,19 @@ abstract class Container{
         if(is_string($class)){
             try{
                 $class = new ReflectionClass($class);
+                AnnotationClassHook::run($class,$this);
             }catch (\Throwable $e){
                 throw new ClassNotFoundException($class, $e);
             }
         }
         return $class;
     }
-    protected function invokeClass(string|ReflectionClass $class,$args=[]):object{
+
+    public function invokeClass(string|ReflectionClass $class,$args=[]):object{
         $class = $this->getClass($class);
         $constructArgs = $this->getMethodArgs($class,"__construct",$args);
         $instance = $class->newInstance(...$constructArgs);
-        $properties = $class->getProperties();
-        foreach ($properties as $property){
-            $attrs = $property->getAttributes();
-            if(!empty($attrs)){
-                foreach ($attrs as $attr){
-                    switch ($attr->getName()){
-                        case Inject::class:
-                            $arg = $attr->getArguments();
-                            if(count($arg) >= 1){
-                                $name = $attr->getArguments()[0];
-                                array_shift($arg);
-                                if($this->has($name)){
-                                    $inject = $this->get($name,$arg);
-                                }else{
-                                    $this->instances[$name] = $inject = $this->invokeClass($name,$arg);
-                                }
-                                $pro = $class->getProperty($property->getName());
-                                $pro->setValue($instance,$inject);
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
+        AnnotationPropertyHook::run($class,$instance,$this);
         return $instance;
     }
 

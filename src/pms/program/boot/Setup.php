@@ -2,16 +2,21 @@
 
 namespace pms\program\boot;
 
+use pms\annotate\Inject;
+use pms\Container;
 use pms\contract\LifecycleInterface;
 use pms\facade\Config;
 use pms\facade\Path;
+use pms\hook\AnnotationPropertyHook;
 use pms\hook\AutoloadHook;
 
-class Setup implements LifecycleInterface {
+class Setup implements LifecycleInterface
+{
 
-    protected static  string $rootPath;
+    protected static string $rootPath;
 
-    public static function start(string $rootPath, Options $bootOptions): void{
+    public static function start(string $rootPath, Options $bootOptions): void
+    {
         static::$rootPath = $rootPath;
 
         /**
@@ -34,9 +39,15 @@ class Setup implements LifecycleInterface {
          */
         static::initConfig();
 
+        /**
+         * 挂载依赖注入
+         */
+        static::initInject();
+
     }
 
-    protected static function initPhpIni(Options $bootOptions): void{
+    protected static function initPhpIni(Options $bootOptions): void
+    {
         date_default_timezone_set($bootOptions->timezone);
         if (!$bootOptions->error_debug) {
             ini_set('display_errors', 'Off');
@@ -49,7 +60,9 @@ class Setup implements LifecycleInterface {
             ini_set($key, $item);
         }
     }
-    protected static function initPath(Options $bootOptions): void{
+
+    protected static function initPath(Options $bootOptions): void
+    {
         $vendorPath = realpath(dirname(__DIR__));
         static::$rootPath = static::$rootPath !== "" ? static::$rootPath : rtrim(dirname($vendorPath, 4), DIRECTORY_SEPARATOR);
         Path::init([
@@ -72,12 +85,14 @@ class Setup implements LifecycleInterface {
         }
     }
 
-    protected static function initAutoload(Options $bootOptions): void{
+    protected static function initAutoload(Options $bootOptions): void
+    {
         AutoloadHook::mount($bootOptions->autoload);
         AutoloadHook::run();
     }
 
-    protected static function initConfig(): void{
+    protected static function initConfig(): void
+    {
         /**
          * 加载系统配置
          */
@@ -93,6 +108,25 @@ class Setup implements LifecycleInterface {
             }
         }
         Config::init(load_file_config($files));
+    }
+
+    protected static function initInject()
+    {
+
+        AnnotationPropertyHook::mount(Inject::class, function (\ReflectionClass $class, \ReflectionProperty $property, array $attrArgs,object  &$obj,Container &$server) {
+            if(count($attrArgs) >= 1){
+                $name = $attrArgs[0];
+                array_shift($attrArgs);
+                if($server->has($name)){
+                    $inject = $server->get($name,$attrArgs);
+                }else{
+                    $inject = $server->invokeClass($name,$attrArgs);
+                    $server->put($name,$inject);
+                }
+                $pro = $class->getProperty($property->getName());
+                $pro->setValue($obj,$inject);
+            }
+        });
     }
 
 
