@@ -6,23 +6,24 @@ use pms\app\InterpreterApp;
 use pms\contract\HookInterface;
 
 class InterpreterHook implements HookInterface{
+
     public static array $container = [];
-    public static function mount(string $serverName, string $serverClass): bool{
-        if(!isset(static::$container[$serverName])){
-            static::$container[$serverName] = $serverClass;
+    public static function mount(string $interpreterName, string $interpreterClass): bool{
+        if(!isset(static::$container[$interpreterName])){
+            static::$container[$interpreterName] = $interpreterClass;
             return true;
         }
         return false;
     }
 
-    public static function run(string $serverName,\pms\program\boot\Options $bootOptions): mixed{
-        if (!isset(static::$container[$serverName])) {
-            exit("解释器 [{$serverName}] 未安装");
+    public static function run(string $interpreterName,\pms\program\boot\Options $bootOptions): mixed{
+        if (!isset(static::$container[$interpreterName])) {
+            exit("解释器 [{$interpreterName}] 未安装");
         }
         /**
          * @var InterpreterApp $server;
          */
-        $server = static::$container[$serverName];
+        $server = static::$container[$interpreterName];
         return $server::run($bootOptions);
     }
 

@@ -96,6 +96,7 @@ class Setup implements LifecycleInterface
         /**
          * 加载系统配置
          */
+
         $configPath = Path::getConfig();
         $files = [];
         if (is_dir($configPath)) {
