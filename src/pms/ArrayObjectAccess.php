@@ -10,9 +10,14 @@ abstract class ArrayObjectAccess implements JsonSerializable,Iterator,ArrayAcces
 
     protected array $data = [];
 
-    public function jsonSerialize(): mixed
+    public function toArray(): array
     {
         return $this->data;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
     }
 
     public function current(): mixed
