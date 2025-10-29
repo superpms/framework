@@ -96,7 +96,6 @@ class Setup implements LifecycleInterface
         /**
          * 加载系统配置
          */
-
         $configPath = Path::getConfig();
         $files = [];
         if (is_dir($configPath)) {
@@ -111,9 +110,8 @@ class Setup implements LifecycleInterface
         Config::init(load_file_config($files));
     }
 
-    protected static function initInject()
+    protected static function initInject(): void
     {
-
         AnnotationPropertyHook::mount(Inject::class, function (\ReflectionClass $class, \ReflectionProperty $property, array $attrArgs,object  &$obj,Container &$server) {
             if(count($attrArgs) >= 1){
                 $name = $attrArgs[0];

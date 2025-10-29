@@ -4,6 +4,14 @@ namespace pms;
 
 abstract class CfgOptions extends ArrayObjectAccess{
 
+    public function __construct(){
+        $tmp = [];
+        foreach ($this->data as $name => $value){
+            $tmp[$this->realName($name)] = $value;
+        }
+        $this->data = $tmp;
+    }
+
     protected function realName(string $name): string
     {
         return strtoupper($name);
