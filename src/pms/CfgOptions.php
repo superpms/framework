@@ -4,14 +4,6 @@ namespace pms;
 
 abstract class CfgOptions extends ArrayObjectAccess{
 
-    public function __construct(){
-        $tmp = [];
-        foreach ($this->data as $name => $value){
-            $tmp[$this->realName($name)] = $value;
-        }
-        $this->data = $tmp;
-    }
-
     protected function realName(string $name): string
     {
         return strtoupper($name);
@@ -55,6 +47,8 @@ abstract class CfgOptions extends ArrayObjectAccess{
         }else if (str_starts_with($name, 'set') && strlen($name) > 3) {
             $name = substr($name, 3);
             return $this->set($name,...$arguments);
+        }else{
+            throw new \Exception("方法$name 不存在");
         }
     }
 }
