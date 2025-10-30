@@ -2,7 +2,7 @@
 
 namespace pms;
 
-class cntrOptions extends ArrayObjectAccess
+class CntrOptions extends ArrayObjectAccess
 {
     /**
      * @throws \Exception
