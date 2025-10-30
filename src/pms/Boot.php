@@ -10,6 +10,8 @@ class Boot
     protected Options $bootOptions;
 
     public function __construct(protected string $rootPath = ""){
+
+        set_error_handler('custom_error_handler');
         /**
          * 初始系统引导文件
          */

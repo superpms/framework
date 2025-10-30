@@ -37,7 +37,7 @@ class Setup implements LifecycleInterface
         /**
          * 初始化系项目配置
          */
-        static::initConfig();
+        Config::fetchConfig(Path::getConfig());
 
         /**
          * 挂载依赖注入
@@ -89,25 +89,6 @@ class Setup implements LifecycleInterface
     {
         AutoloadHook::mount($bootOptions->autoload);
         AutoloadHook::run();
-    }
-
-    protected static function initConfig(): void
-    {
-        /**
-         * 加载系统配置
-         */
-        $configPath = Path::getConfig();
-        $files = [];
-        if (is_dir($configPath)) {
-            $files = glob($configPath . '/*' . '.php');
-        }
-        if (is_dev()) {
-            $devConfigPath = path_join($configPath, "dev");
-            if (is_dir($devConfigPath)) {
-                $files = array_merge($files, glob($devConfigPath . '/*.php'));
-            }
-        }
-        Config::init(load_file_config($files));
     }
 
     protected static function initInject(): void

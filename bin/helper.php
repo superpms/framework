@@ -2,8 +2,15 @@
 
 use pms\facade\Path;
 
+if (!function_exists('custom_error_handler')) {
+    function custom_error_handler($errno, $errstr, $errfile, int $errline)
+    {
+        throw new \pms\exception\WarningException($errno, $errstr, $errfile, $errline);
+    }
+}
+
 if (!function_exists('dd')) {
-    function dd(mixed ...$vars):void
+    function dd(mixed ...$vars): void
     {
         if (!in_console() && !headers_sent()) {
             header('HTTP/1.1 500 Internal Server Error');
@@ -16,9 +23,9 @@ if (!function_exists('dd')) {
                 \Symfony\Component\VarDumper\VarDumper::dump($v, is_int($k) ? 1 + $k : $k);
             }
         }
-        if(!in_console()){
+        if (!in_console()) {
             die;
-        }else{
+        } else {
             throw new \pms\exception\CliModeForcedInterruptException("die");
         }
     }
@@ -38,13 +45,15 @@ if (!function_exists('json_validate')) {
     }
 }
 
-if(!function_exists('in_console')){
-    function in_console(): bool{
-        return in_array(PHP_SAPI, ['cli', 'phpdbg','embed'], true);
+if (!function_exists('in_console')) {
+    function in_console(): bool
+    {
+        return in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true);
     }
 }
-if(!function_exists('in_swoole')){
-    function in_swoole(): bool{
+if (!function_exists('in_swoole')) {
+    function in_swoole(): bool
+    {
         return defined('SWOOLE_VERSION') && SWOOLE_VERSION !== null;
     }
 }
@@ -52,18 +61,19 @@ if(!function_exists('in_swoole')){
 if (!function_exists('config')) {
     function config(string $name = null, $default = null)
     {
-        return \pms\facade\Config::get($name,$default);
+        return \pms\facade\Config::get($name, $default);
     }
 }
 if (!function_exists('is_dev')) {
-    function is_dev():bool
+    function is_dev(): bool
     {
         return file_exists(Path::getRoot("/dev.lock"));
     }
 }
 
-if(!function_exists('path_join')){
-    function path_join(...$segments): string{
+if (!function_exists('path_join')) {
+    function path_join(...$segments): string
+    {
         $symbol = DIRECTORY_SEPARATOR;
         $noSymbol = $symbol === '/' ? '\\' : '/';
         $segments = array_filter($segments);
@@ -77,7 +87,7 @@ if(!function_exists('path_join')){
         $parts = explode($symbol, join($symbol, $path));
         $stack = [];
 
-        foreach ($parts as $key=> $part) {
+        foreach ($parts as $key => $part) {
             // 忽略空段和当前目录
             if (($key !== 0 && $part === '') || $part === '.') continue;
 
@@ -93,15 +103,17 @@ if(!function_exists('path_join')){
         return implode($symbol, $stack);
     }
 }
-if(!function_exists('path_class')){
-    function path_class(string $path): string{
+if (!function_exists('path_class')) {
+    function path_class(string $path): string
+    {
         $path = str_replace(DIRECTORY_SEPARATOR, '\\', $path);
         return str_replace('.php', '', $path);
     }
 }
 
-if(!function_exists('array_chain')){
-    function array_chain(array $data, string $chain, string $chainLevelStr = '.'){
+if (!function_exists('array_chain')) {
+    function array_chain(array $data, string $chain, string $chainLevelStr = '.')
+    {
         $tmp = $data;
         $fA = explode($chainLevelStr, $chain);
         for ($i = 0; $i < count($fA); $i++) {
@@ -115,9 +127,40 @@ if(!function_exists('array_chain')){
         return $tmp;
     }
 }
-if(!function_exists('array_to_xml')){
-    function array_to_xml(array|object $array, string $root = 'root'): bool|string{
-        function arrayToXml($array, &$xml): void{
+if (!function_exists('array_chain_set')) {
+    function array_chain_set(array &$data, string $chain, mixed $value, string $chainLevelStr = '.'): void
+    {
+        $result = &$data;
+        $current = &$result;
+
+        $fA = explode($chainLevelStr, $chain);
+        if (count($fA) === 1) {
+            $result[$chain] = $value;
+            return;
+        }
+        for ($i = 0; $i < count($fA); $i++) {
+            $item = $fA[$i];
+
+            if (!isset($current[$item])) {
+                $current[$item] = [];
+            }
+            if ($i === count($fA) - 1) {
+                $current[$item] = $value;
+            } else {
+                if (!is_array($current[$item])) {
+                    throw new \Exception('array_chain_set: ' . $item . ' is not a ordinary object in chain ' . $chain);
+                }
+                $current = &$current[$item];
+            }
+        }
+        return;
+    }
+}
+if (!function_exists('array_to_xml')) {
+    function array_to_xml(array|object $array, string $root = 'root'): bool|string
+    {
+        function arrayToXml($array, &$xml): void
+        {
             foreach ($array as $key => $value) {
                 if (is_array($value) || is_object($value)) {
                     if (!is_numeric($key)) {
@@ -137,31 +180,131 @@ if(!function_exists('array_to_xml')){
         return $xml->saveXML();
     }
 }
+if (!function_exists('array_merge_deep')) {
+    function array_merge_deep(...$args): array
+    {
+        $result = [];
+        foreach ($args as $array) {
+            if (is_array($array)) {
+                foreach ($array as $key => $value) {
+                    if (is_array($value) && isset($result[$key]) && is_array($result[$key])) {
+                        $result[$key] = array_merge_deep($result[$key], $value);
+                    } else {
+                        $result[$key] = $value;
+                    }
+                }
+            } else {
+                $result[] = $array;
+            }
+        }
+        return $result;
+    }
+}
 
 
-if(!function_exists('load_file_config')){
+if (!function_exists('config_load_php')) {
+    function config_load_php(string $file)
+    {
+        if (is_file($file)) {
+            return include $file;
+        }
+        return [];
+    }
+}
+if (!function_exists('config_load_ini')) {
+    function config_load_ini(string $file): array
+    {
+        if (!is_file($file)) {
+            return [];
+        }
+        $file = file_get_contents($file);
+        $fileArr = explode("\r\n", $file);
+
+        $fileStr = "";
+        foreach ($fileArr as $value) {
+            if (str_starts_with($value, '#')) {
+                continue;
+            }
+            $fileStr .= $value . "\r\n";
+        }
+
+        $info = parse_ini_string($fileStr, true, INI_SCANNER_TYPED);
+
+        if ($info === false) {
+            return [];
+        }
+        $data = [];
+        foreach ($info as $key => $value) {
+            if($key === '/'){
+                $data = [
+                    ...$data,
+                    ...$value,
+                ];
+                continue;
+            }
+            $data[$key] = $value;
+        }
+        $tmp = [];
+        foreach ($data as $key => $value) {
+            if(is_array($value)){
+                foreach ($value as $key2 => $value2) {
+                    array_chain_set($tmp, $key . '.' . $key2, $value2);
+                }
+            }else{
+                array_chain_set($tmp, $key, $value);
+            }
+        }
+        return $tmp;
+    }
+}
+if (!function_exists('load_file_config')) {
     function load_file_config(string|array $filePath): array
     {
-        if(is_string($filePath)){
+        if (is_string($filePath)) {
             $filePath = [$filePath];
         }
         $config = [];
         foreach ($filePath as $file) {
             $name = pathinfo($file, PATHINFO_FILENAME);
             if (is_file($file)) {
-                $config[strtolower($name)] = include $file;
+                $name = strtolower($name);
+                $extension = pathinfo($file, PATHINFO_EXTENSION);
+                $tmp = [];
+                switch ($extension) {
+                    case 'php':
+                        $tmp = config_load_php($file);
+                        break;
+                    case 'json':
+                        $tmp = json_decode(file_get_contents($file), true);
+                        break;
+                    case 'ini':
+                        $tmp = config_load_ini($file);
+                        break;
+                }
+                if (!isset($config[$name])) {
+                    $config[$name] = $tmp;
+                } else {
+                    if($extension === 'ini'){
+                        if(!empty($tmp)){
+                            $config[$name] = array_merge_deep($config[$name], $tmp);
+                        }
+                    }else{
+                        $config[$name] = $tmp;
+                    }
+                }
             }
         }
         return $config;
     }
-}else{
+} else {
     throw new \Exception("PMS 核心函数 load_file_config 被重载");
 }
 
-if(!function_exists('str_to_fn')){
-    function str_to_fn(string|array $fnName, $value): mixed{
-        if(is_array($fnName)){
-            $fnName = join('|',$fnName);
+if (!function_exists('str_to_fn')) {
+    function str_to_fn(string|array $fnName, $value): mixed
+    {
+        if (is_array($fnName)) {
+            $fnName = join('|', $fnName);
         }
         $fnName = strtoupper($fnName);
         $fnName = str_replace('|', ',', $fnName);
@@ -189,7 +332,7 @@ if(!function_exists('str_to_fn')){
                     break;
                 case "STR":
                 case "STRING":
-                    $value = $value . '';
+                    $value = (string)$value;
                     break;
                 case "TOJSONSTR":
                 case "TOJSONSTRING":
@@ -204,19 +347,19 @@ if(!function_exists('str_to_fn')){
                     }
                     break;
                 case 'PARSESTR':
-                    if(is_string($value)){
+                    if (is_string($value)) {
                         $newValue = [];
                         parse_str($value, $newValue);
                         $value = $newValue;
                     }
                     break;
                 case 'STRTOUPPER':
-                    if(is_string($value)){
+                    if (is_string($value)) {
                         $value = strtoupper($value);
                     }
                     break;
                 case 'STRTOLOWER':
-                    if(is_string($value)){
+                    if (is_string($value)) {
                         $value = strtolower($value);
                     }
                     break;
@@ -226,18 +369,18 @@ if(!function_exists('str_to_fn')){
     }
 }
 
-if(!function_exists('bit_or')){
+if (!function_exists('bit_or')) {
     /**
      * 分离或运算和值
      * @param array $keyMap 或运算索引表(所有能进行或运算的原子值集合)[1,2,4,...]
      * @param int $value 和值(通过索引表中包含的数进行的任意或运算)
      * @return array
      */
-    function bit_or(array$keyMap,int $value): array
+    function bit_or(array $keyMap, int $value): array
     {
         $result = [];
         foreach ($keyMap as $v) {
-            if(($value & $v) === $v){
+            if (($value & $v) === $v) {
                 $result[] = $v;
             }
         }
@@ -245,16 +388,17 @@ if(!function_exists('bit_or')){
     }
 }
 
-if(!function_exists('valid_datatype_or')){
+if (!function_exists('valid_datatype_or')) {
     /**
      * 验证数据类型(或)
      * @param string|array $type 数据类型(传入数组 或 用 | 分割多个类型)
-     * @param mixed $datum  数据
+     * @param mixed $datum 数据
      * @return bool
      */
-    function valid_datatype_or(string|array $type, mixed $datum): bool{
+    function valid_datatype_or(string|array $type, mixed $datum): bool
+    {
         try {
-            if(is_array($type)){
+            if (is_array($type)) {
                 $type = join('|', $type);
             }
             $type = strtoupper($type);
@@ -299,7 +443,7 @@ if(!function_exists('valid_datatype_or')){
     }
 }
 
-if(!function_exists('dir_create')){
+if (!function_exists('dir_create')) {
     /**
      * 创建文件夹
      * @param string $path 文件夹地址
@@ -315,7 +459,7 @@ if(!function_exists('dir_create')){
         return true;
     }
 }
-if(!function_exists('file_create')){
+if (!function_exists('file_create')) {
     /**
      * 创建文件
      * @param string $path 文件地址
@@ -326,7 +470,8 @@ if(!function_exists('file_create')){
      * ‘x'：创建文件，在文件不存在时才创建。
      * @return bool
      */
-    function file_create(string $path, string $data, string $mode = "w"): bool{
+    function file_create(string $path, string $data, string $mode = "w"): bool
+    {
         dir_create(pathinfo($path)['dirname']);
         $file = fopen($path, $mode);
         if (!$file) {
@@ -337,3 +482,4 @@ if(!function_exists('file_create')){
         return true;
     }
 }
+
