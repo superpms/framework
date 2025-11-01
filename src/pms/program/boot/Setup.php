@@ -124,7 +124,7 @@ class Setup implements LifecycleInterface
     public static function validatePhpFunction(Options $bootOptions): void
     {
         foreach ($bootOptions->php_function as $item){
-            if(!function_exists($item)){
+            if(!str_starts_with($item, '#') && !function_exists($item)){
                 throw new \Exception("PHP函数 {$item} 无法使用");
             }
         }
@@ -132,7 +132,7 @@ class Setup implements LifecycleInterface
     public static function validatePhpExtension(Options $bootOptions): void
     {
         foreach ($bootOptions->php_extension as $item){
-            if(!extension_loaded($item)){
+            if(!str_starts_with($item, '#') && !extension_loaded($item)){
                 throw new \Exception("PHP扩展 {$item} 尚未安装");
             }
         }
