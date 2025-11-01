@@ -25,6 +25,18 @@ class Setup implements LifecycleInterface
         static::initPhpIni($bootOptions);
 
         /**
+         * PHP扩展验证
+         */
+        static::validatePhpExtension($bootOptions);
+
+        /**
+         * PHP函数验证
+         */
+        static::validatePhpFunction($bootOptions);
+
+
+
+        /**
          * 初始化路径导航系统
          */
         static::initPath($bootOptions);
@@ -109,5 +121,21 @@ class Setup implements LifecycleInterface
         });
     }
 
+    public static function validatePhpFunction(Options $bootOptions): void
+    {
+        foreach ($bootOptions->php_function as $item){
+            if(!function_exists($item)){
+                throw new \Exception("PHP函数 {$item} 无法使用");
+            }
+        }
+    }
+    public static function validatePhpExtension(Options $bootOptions): void
+    {
+        foreach ($bootOptions->php_extension as $item){
+            if(!extension_loaded($item)){
+                throw new \Exception("PHP扩展 {$item} 尚未安装");
+            }
+        }
+    }
 
 }

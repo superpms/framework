@@ -14,6 +14,8 @@ use pms\CfgOptions;
  * @property boolean $error_debug;
  * @property boolean $log_debug;
  * @property object $php_ini;
+ * @property array $php_function;
+ * @property array $php_extension;
  * @property object $extend;
  */
 class Options extends CfgOptions
@@ -28,7 +30,9 @@ class Options extends CfgOptions
         $this->autoload = $boot?->autoload ?? [];
         $this->error_debug = $boot?->error_debug ?? true;
         $this->log_debug = $boot?->log_debug ?? false;
-        $this->php_ini = $boot?->php_ini ?? (object)[];
+        $this->php_ini = $boot?->php?->ini ?? (object)[];
+        $this->php_function = $boot?->php?->function ?? [];
+        $this->php_extension = $boot?->php?->extension ?? [];
         $this->extend = $boot?->extend ?? (object)[];
     }
 }
