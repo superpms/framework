@@ -25,8 +25,7 @@ class Boot
         }
         $bootConfig = json_decode($fileContent);
         $this->bootOptions = new Options($bootConfig);
-
-        LifecycleHook::run($this->rootPath,$this->bootOptions);
+        LifecycleHook::run(LIFECYCLE_BOOT,$this->rootPath,$this->bootOptions);
     }
 
 

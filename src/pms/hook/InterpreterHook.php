@@ -7,7 +7,9 @@ use pms\contract\HookInterface;
 
 class InterpreterHook implements HookInterface{
 
-    public static array $container = [];
+
+    protected static array $container = [];
+
     public static function mount(string $interpreterName, string $interpreterClass): bool{
         if(!isset(static::$container[$interpreterName])){
             static::$container[$interpreterName] = $interpreterClass;
@@ -25,6 +27,10 @@ class InterpreterHook implements HookInterface{
          */
         $server = static::$container[$interpreterName];
         return $server::run($bootOptions);
+    }
+
+    public static function audit(): array{
+        return static::$container;
     }
 
 }

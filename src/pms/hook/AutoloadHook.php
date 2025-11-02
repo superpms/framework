@@ -8,7 +8,7 @@ use pms\facade\Path;
 class AutoloadHook implements HookInterface
 {
 
-    public static array $container = [];
+    protected static array $container = [];
 
     public static function mount(string|array|\Closure $filePaths): bool
     {
@@ -42,5 +42,10 @@ class AutoloadHook implements HookInterface
                 require_once $filePath;
             }
         }
+    }
+
+    public static function audit(): array
+    {
+        return static::$container;
     }
 }

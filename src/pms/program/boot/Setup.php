@@ -35,7 +35,6 @@ class Setup implements LifecycleInterface
         static::validatePhpFunction($bootOptions);
 
 
-
         /**
          * 初始化路径导航系统
          */

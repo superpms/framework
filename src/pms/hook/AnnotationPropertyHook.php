@@ -8,7 +8,7 @@ use ReflectionClass;
 
 class AnnotationPropertyHook implements HookInterface
 {
-    public static array $container = [];
+    protected static array $container = [];
 
     public static function mount(string $annotateClass, \Closure $fn): bool
     {
@@ -32,5 +32,10 @@ class AnnotationPropertyHook implements HookInterface
             }
         }
         return $obj;
+    }
+
+    public static function audit(): array
+    {
+        return static::$container;
     }
 }

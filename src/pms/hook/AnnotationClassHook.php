@@ -8,7 +8,8 @@ use ReflectionClass;
 
 class AnnotationClassHook implements HookInterface
 {
-    public static array $container = [];
+
+    protected static array $container = [];
 
     public static function mount(string $annotateClass, \Closure $fn): bool
     {
@@ -29,5 +30,10 @@ class AnnotationClassHook implements HookInterface
                 static::$container[$attrName]($class,$classAttrArgs,$server);
             }
         }
+    }
+
+    public static function audit(): array
+    {
+        return static::$container;
     }
 }

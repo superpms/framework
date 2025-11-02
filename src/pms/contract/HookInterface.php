@@ -8,4 +8,8 @@ namespace pms\contract;
  */
 interface HookInterface{
 
+    /**
+     * 审计
+     */
+    public static function audit();
 }

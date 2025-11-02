@@ -12,3 +12,4 @@ const XML_CONTENT_TYPE = 'text/xml;charset=utf-8;';
 const PNG_CONTENT_TYPE = 'image/png';
 const JPEG_CONTENT_TYPE = 'image/jpeg';
 const MPEG_CONTENT_TYPE = 'audio/mpeg';
+const LIFECYCLE_BOOT = 'LIFECYCLE_BOOT';
