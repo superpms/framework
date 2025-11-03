@@ -547,13 +547,12 @@ if (!function_exists('has_process')) {
 }
 
 if (!function_exists('call_php_script')) {
-    function call_php_script(string $path, $cmd, $logPath = null, bool $silence = true)
-    {
-        $silenceStr = $silence ? ' 2>&1 ' : '';
+    function call_php_script(string $path, $cmd, $logPath = null): void{
         if (PHP_OS === 'WINNT') {
-            return shell_exec("cd {$path} && $cmd > $logPath$silenceStr");
+            $handle = popen("cd {$path} &&start /B $cmd > $logPath",'r');
         } else {
-            return shell_exec("cd {$path} && nohup $cmd > $logPath$silenceStr");
+            $handle = popen("cd {$path} && nohup $cmd > $logPath 2>&1 &",'r');
         }
+        pclose($handle);
     }
 }
