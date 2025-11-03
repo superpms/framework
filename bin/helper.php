@@ -527,3 +527,33 @@ if(!function_exists('annotate_attrs')){
     }
 }
 
+
+if (!function_exists('has_process')) {
+    function has_process(int $pid): bool
+    {
+        if (PHP_OS === 'WINNT') {
+            $output = shell_exec("tasklist /FI \"PID eq $pid\"");
+            return str_contains($output, $pid);
+        } else {
+            if (function_exists('posix_kill')) {
+                return posix_kill($pid, 0);
+            }
+            if (is_dir("/proc/{$pid}")) {
+                return true;
+            }
+            return is_dir("/proc/{$pid}");
+        }
+    }
+}
+
+if(!function_exists('call_php_script')){
+    function call_php_script(string $path, $cmd, $logPath = null): bool
+    {
+        if (PHP_OS === 'WINNT') {
+            shell_exec("cd {$path} && $cmd > $logPath 2>&1 ");
+        } else {
+            shell_exec("cd {$path} && nohup $cmd > $logPath 2>&1 ");
+        }
+        return true;
+    }
+}
