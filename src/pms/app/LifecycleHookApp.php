@@ -11,7 +11,7 @@ abstract class LifecycleHookApp implements HookInterface
 
     public static function mount(string $lifecycle, callable|string $callable): bool
     {
-        if (!array_key_exists($lifecycle, self::$container)) {
+        if (!array_key_exists($lifecycle, static::$container)) {
            return false;
         }
         if(!is_callable($callable)){
@@ -20,14 +20,14 @@ abstract class LifecycleHookApp implements HookInterface
                 return false;
             }
         }
-        self::$container[$lifecycle][] = $callable;
+        static::$container[$lifecycle][] = $callable;
         return true;
     }
 
     public static function run(string $lifecycle, ...$args): void
     {
-        if (array_key_exists($lifecycle, self::$container)) {
-            foreach (self::$container[$lifecycle] as $closure) {
+        if (array_key_exists($lifecycle, static::$container)) {
+            foreach (static::$container[$lifecycle] as $closure) {
                 call_user_func_array($closure, $args);
             }
         }
