@@ -483,3 +483,47 @@ if (!function_exists('file_create')) {
     }
 }
 
+if(!function_exists('annotate_attrs')){
+    /**
+     * @param ReflectionClass $class
+     * @param string $name
+     * @param bool $final 是否只返回最后一项
+     * @return ReflectionAttribute|ReflectionAttribute[]
+     */
+    function annotate_attrs(ReflectionClass $class, string $name, bool $final = false): array|ReflectionAttribute
+    {
+        // 获取当前类的属性
+        $attrs = $class->getAttributes($name);
+        if ($final && !empty($attrs)) {
+            return $attrs[count($attrs) - 1];
+        }
+        // 获取当前类 所有 trait 中的注解属性
+        foreach (array_reverse($class->getTraits()) as $trait) {
+            $child = annotate_attrs($trait, $name, $final);
+            $child = $final ? [$child] : $child;
+            $attrs = [
+                ...$child,
+                ...$attrs,
+            ];
+            if ($final && !empty($attrs)) {
+                return $attrs[count($attrs) - 1];
+            }
+        }
+
+        $class = $class->getParentClass();
+        if ($class) {
+            $child = annotate_attrs($class, $name, $final);
+            $child = $final ? [$child] : $child;
+            $attrs = [
+                ...$child,
+                ...$attrs,
+            ];
+        }
+        if ($final && !empty($attrs)) {
+            return $attrs[count($attrs) - 1];
+        }
+        return $attrs;
+
+    }
+}
+
