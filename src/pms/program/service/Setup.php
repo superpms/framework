@@ -26,7 +26,8 @@ class Setup implements LifecycleInterface
                 $lifecycle = $item::$lifecycle;
                 $hook::mount($lifecycle, [$item, 'start']);
             } else {
-                throw new \Exception("service {$item::class}: {$item::$hookClass} is not LifecycleHookApp");
+                $serviceName = $item::class;
+                throw new \Exception("service {$serviceName}: {$item::$hookClass} is not LifecycleHookApp");
             }
         }
 
