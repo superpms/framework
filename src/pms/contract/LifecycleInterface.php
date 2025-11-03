@@ -1,9 +1,10 @@
 <?php
 
 namespace pms\contract;
-
+/**
+ * @method static start
+ */
 interface LifecycleInterface
 {
-    public static function start(string $rootPath, \pms\program\boot\Options $bootOptions);
 
 }
