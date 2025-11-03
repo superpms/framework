@@ -235,7 +235,7 @@ if (!function_exists('config_load_ini')) {
         }
         $data = [];
         foreach ($info as $key => $value) {
-            if($key === '/'){
+            if ($key === '/') {
                 $data = [
                     ...$data,
                     ...$value,
@@ -246,11 +246,11 @@ if (!function_exists('config_load_ini')) {
         }
         $tmp = [];
         foreach ($data as $key => $value) {
-            if(is_array($value)){
+            if (is_array($value)) {
                 foreach ($value as $key2 => $value2) {
                     array_chain_set($tmp, $key . '.' . $key2, $value2);
                 }
-            }else{
+            } else {
                 array_chain_set($tmp, $key, $value);
             }
         }
@@ -284,11 +284,11 @@ if (!function_exists('load_file_config')) {
                 if (!isset($config[$name])) {
                     $config[$name] = $tmp;
                 } else {
-                    if($extension === 'ini'){
-                        if(!empty($tmp)){
+                    if ($extension === 'ini') {
+                        if (!empty($tmp)) {
                             $config[$name] = array_merge_deep($config[$name], $tmp);
                         }
-                    }else{
+                    } else {
                         $config[$name] = $tmp;
                     }
                 }
@@ -483,7 +483,7 @@ if (!function_exists('file_create')) {
     }
 }
 
-if(!function_exists('annotate_attrs')){
+if (!function_exists('annotate_attrs')) {
     /**
      * @param ReflectionClass $class
      * @param string $name
@@ -546,14 +546,14 @@ if (!function_exists('has_process')) {
     }
 }
 
-if(!function_exists('call_php_script')){
-    function call_php_script(string $path, $cmd, $logPath = null): bool
+if (!function_exists('call_php_script')) {
+    function call_php_script(string $path, $cmd, $logPath = null, bool $silence = true)
     {
+        $silenceStr = $silence ? ' 2>&1 ' : '';
         if (PHP_OS === 'WINNT') {
-            shell_exec("cd {$path} && $cmd > $logPath 2>&1 ");
+            return shell_exec("cd {$path} && $cmd > $logPath$silenceStr");
         } else {
-            shell_exec("cd {$path} && nohup $cmd > $logPath 2>&1 ");
+            return shell_exec("cd {$path} && nohup $cmd > $logPath$silenceStr");
         }
-        return true;
     }
 }
