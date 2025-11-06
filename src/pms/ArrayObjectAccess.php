@@ -4,8 +4,9 @@ namespace pms;
 use ArrayAccess;
 use Iterator;
 use JsonSerializable;
+use Countable;
 
-abstract class ArrayObjectAccess implements JsonSerializable,Iterator,ArrayAccess
+abstract class ArrayObjectAccess implements JsonSerializable,Iterator,ArrayAccess,Countable
 {
 
     protected array $data = [];
@@ -69,4 +70,8 @@ abstract class ArrayObjectAccess implements JsonSerializable,Iterator,ArrayAcces
         unset($this->data[$offset]);
     }
 
+    public function count(): int
+    {
+        return count($this->data);
+    }
 }
