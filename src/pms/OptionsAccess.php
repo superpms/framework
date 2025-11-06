@@ -114,7 +114,7 @@ abstract class OptionsAccess implements JsonSerializable, Iterator, ArrayAccess,
             return $this->data[$this->realKey($name)];
         }
         if (static::missing && $default === null) {
-            return $this->$default($name);
+            return $this->missing($name);
         }
         return $default;
     }
@@ -153,6 +153,37 @@ abstract class OptionsAccess implements JsonSerializable, Iterator, ArrayAccess,
         }
     }
 
+    public function column(string $name): array
+    {
+        return array_column($this->data, $name);
+    }
+
+    public function map(callable $callback): array
+    {
+        return array_map($callback, $this->data);
+    }
+
+    public function filter(callable $callback): array
+    {
+        return array_filter($this->data, $callback);
+    }
+
+    public function reduce(callable $callback, mixed $initial = null): mixed
+    {
+        return array_reduce($this->data, $callback, $initial);
+    }
+
+    public function each(callable $callback): void
+    {
+        foreach ($this->data as $key => $value) {
+            $callback($value, $key);
+        }
+    }
+
+    public function keys(): array
+    {
+        return array_keys($this->data);
+    }
 
     public function __construct(bool $handleProperty = true)
     {
