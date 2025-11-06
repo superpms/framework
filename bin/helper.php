@@ -140,7 +140,6 @@ if (!function_exists('array_chain_set')) {
         }
         for ($i = 0; $i < count($fA); $i++) {
             $item = $fA[$i];
-
             if (!isset($current[$item])) {
                 $current[$item] = [];
             }
@@ -148,7 +147,7 @@ if (!function_exists('array_chain_set')) {
                 $current[$item] = $value;
             } else {
                 if (!is_array($current[$item])) {
-                    throw new \Exception('array_chain_set: ' . $item . ' is not a ordinary object in chain ' . $chain);
+                    throw new \Exception('chain_set: ' . $item . ' is not a ordinary object in chain ' . $chain);
                 }
                 $current = &$current[$item];
             }
@@ -201,6 +200,18 @@ if (!function_exists('array_merge_deep')) {
     }
 }
 
+
+if (!function_exists('object_chain')) {
+    function object_chain(array $data, string $chain, string $chainLevelStr = '.')
+    {
+        return array_chain($data, $chain, $chainLevelStr);
+    }
+}
+if (!function_exists('object_chain_set')) {
+    function object_chain_set(array &$data, string $chain, mixed $value, string $chainLevelStr = '.'): void{
+        array_chain_set($data, $chain, $chainLevelStr);
+    }
+}
 
 if (!function_exists('config_load_php')) {
     function config_load_php(string $file)

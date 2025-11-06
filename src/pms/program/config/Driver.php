@@ -2,15 +2,12 @@
 
 namespace pms\program\config;
 
-use JetBrains\PhpStorm\NoReturn;
-
 class Driver
 {
 
     protected string $development = 'dev';
 
     protected array $data = [];
-
 
     public function mount(string $key, mixed $data): bool
     {
@@ -37,7 +34,7 @@ class Driver
         if ($name === null) {
             return $this->data;
         }
-        $data = array_chain($this->data, $name);
+        $data = object_chain($this->data, $name);
         return $data !== null ? $data : $default;
     }
 

@@ -1,6 +1,6 @@
 <?php
 namespace pms\program\boot;
-use pms\CfgOptions;
+use pms\OptionsAccessCfg;
 
 
 /**
@@ -18,11 +18,12 @@ use pms\CfgOptions;
  * @property array $php_extension;
  * @property object $extend;
  */
-class Options extends CfgOptions
+class Options extends OptionsAccessCfg
 {
 
     public function __construct($boot)
     {
+        parent::__construct();
         $this->timezone = $boot?->timezone ?? 'Asia/Shanghai';
         $this->dir_app = $boot?->dir?->app ?? 'app';
         $this->dir_config = $boot?->dir?->config ?? 'config';
