@@ -154,9 +154,13 @@ abstract class OptionsAccess implements JsonSerializable, Iterator, ArrayAccess,
     }
 
 
-    public function __construct(){
-        $tmp = get_object_vars($this);
-        unset($tmp['data']);
+    public function __construct(bool $initProperty = true)
+    {
+        $tmp = [];
+        if ($initProperty) {
+            $tmp = get_object_vars($this);
+            unset($tmp['data']);
+        }
         $real = [
             ...$this->data,
             ...$tmp,
