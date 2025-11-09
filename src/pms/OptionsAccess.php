@@ -79,6 +79,11 @@ abstract class OptionsAccess implements JsonSerializable, Iterator, ArrayAccess,
         return count($this->data);
     }
 
+    public function isEmpty(): bool
+    {
+        return empty($this->data);
+    }
+
 
     public function __get(string $name): mixed
     {
