@@ -19,6 +19,12 @@ class Setup implements LifecycleInterface
     {
         static::$rootPath = $rootPath;
 
+
+        /**
+         * 初始化路径导航系统
+         */
+        static::initPath($bootOptions);
+
         /**
          * 项目级 PHP配置覆盖
          */
@@ -33,12 +39,6 @@ class Setup implements LifecycleInterface
          * PHP函数验证
          */
         static::validatePhpFunction($bootOptions);
-
-
-        /**
-         * 初始化路径导航系统
-         */
-        static::initPath($bootOptions);
 
         /**
          * 初始化自动导入文件
@@ -60,15 +60,15 @@ class Setup implements LifecycleInterface
     protected static function initPhpIni(Options $bootOptions): void
     {
         date_default_timezone_set($bootOptions->timezone);
+        foreach ($bootOptions->php_ini as $key => $item) {
+            ini_set($key, $item);
+        }
         if (!$bootOptions->error_debug) {
             ini_set('display_errors', 'Off');
         }
         if ($bootOptions->log_debug) {
             ini_set('log_errors', 'On');
             ini_set('error_log', Path::getRuntime('/base/error.log'));
-        }
-        foreach ($bootOptions->php_ini as $key => $item) {
-            ini_set($key, $item);
         }
     }
 
