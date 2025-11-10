@@ -9,28 +9,35 @@ use pms\program\boot\Options;
 
 class Setup implements LifecycleInterface
 {
-
-    public static function start(string $rootPath, Options $bootOptions): void
-    {
-        /**
-         * @var ServiceApp[] $service
-         */
-        $service = config('service', []);
-
-        foreach ($service as $item) {
-            if (class_exists($item::$hookClass) && is_subclass_of($item::$hookClass, LifecycleHookApp::class)) {
-                /**
-                 * @var LifecycleHookApp $hook
-                 */
-                $hook = $item::$hookClass;
-                $lifecycle = $item::$lifecycle;
-                $hook::mount($lifecycle, [$item, 'start']);
-            } else {
-                $serviceName = $item::class;
-                throw new \Exception("service {$serviceName}: {$item::$hookClass} is not LifecycleHookApp");
-            }
-        }
-
-    }
-
+	
+	public static function start(string $rootPath, Options $bootOptions): void
+	{
+		/**
+		 * @var ServiceApp[] $service
+		 */
+		$service = config('service', []);
+		
+		foreach ($service as $item) {
+			if (!empty($item) && class_exists($item)) {
+				if (!class_exists($item::$hookClass)){
+					if (!$item::$ignore) {
+						throw new \Exception("service {$item::class}: hookClass {$item::$hookClass} is not exists");
+					}
+					continue;
+				}
+				if (is_subclass_of($item::$hookClass, LifecycleHookApp::class)) {
+					/**
+					 * @var LifecycleHookApp $hook
+					 */
+					$hook = $item::$hookClass;
+					$lifecycle = $item::$lifecycle;
+					$hook::mount($lifecycle, [$item, 'start']);
+				} else {
+					$serviceName = $item::class;
+					throw new \Exception("service {$serviceName}: {$item::$hookClass} is not LifecycleHookApp");
+				}
+			}
+		}
+	}
+	
 }
