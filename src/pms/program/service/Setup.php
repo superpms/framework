@@ -22,10 +22,9 @@ class Setup implements LifecycleInterface
 				if(!is_subclass_of($item, ServiceApp::class)){
 					continue;
 				}
-				$serviceName = $item::class;
 				if (!class_exists($item::$hookClass)){
 					if (!$item::$ignore) {
-						throw new \Exception("service {$serviceName}: hookClass {$item::$hookClass} is not exists");
+						throw new \Exception("service {$item}: hookClass {$item::$hookClass} is not exists");
 					}
 					continue;
 				}
@@ -37,7 +36,7 @@ class Setup implements LifecycleInterface
 					$lifecycle = $item::$lifecycle;
 					$hook::mount($lifecycle, [$item, 'start']);
 				} else {
-					throw new \Exception("service {$serviceName}: {$item::$hookClass} is not LifecycleHookApp");
+					throw new \Exception("service {$item}: {$item::$hookClass} is not LifecycleHookApp");
 				}
 			}
 		}
