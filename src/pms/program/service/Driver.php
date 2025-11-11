@@ -2,7 +2,7 @@
 
 namespace pms\program\service;
 
-use pms\app\AdapterHookApp;
+use pms\app\AdapterApp;
 use pms\app\LifecycleHookApp;
 use pms\app\ServiceApp;
 
@@ -54,7 +54,7 @@ class Driver
 		}
 		
 		/**
-		 * @var LifecycleHookApp|AdapterHookApp $hook
+		 * @var LifecycleHookApp|AdapterApp $hook
 		 */
 		$hook = $item::$hookClass;
 		$lifecycle = $item::$lifecycle;
@@ -65,7 +65,7 @@ class Driver
 			}
 			$hook::mount($lifecycle, [$item, 'entry']);
 		} else {
-			if (!is_subclass_of($hook, AdapterHookApp::class)) {
+			if (!is_subclass_of($hook, AdapterApp::class)) {
 				throw new \Exception("service {$item}: {$hook} is not a AdapterHookApp");
 			}
 			$hook::mount($lifecycle, $adapter, [$item, 'entry']);

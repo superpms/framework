@@ -12,7 +12,7 @@ use pms\contract\HookAppInterface;
  *       连接器：到达某个生命周期时，仅触发当前连接点下的钩子,控制更加精细。
  *       连接器：同一个生命周期下的同一个连接器只能挂载一个,重复挂载会覆盖
  */
-abstract class AdapterHookApp implements HookAppInterface
+abstract class AdapterApp implements HookAppInterface
 {
 	protected static array $container = [];
 	
