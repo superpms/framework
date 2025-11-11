@@ -3,9 +3,9 @@
 namespace pms\hook;
 
 use pms\app\InterpreterApp;
-use pms\contract\HookInterface;
+use pms\contract\HookAppInterface;
 
-class InterpreterHook implements HookInterface{
+class InterpreterHook implements HookAppInterface{
 
 
     protected static array $container = [];
@@ -26,7 +26,7 @@ class InterpreterHook implements HookInterface{
          * @var InterpreterApp $server;
          */
         $server = static::$container[$interpreterName];
-        return $server::run($bootOptions);
+        return $server::entry($bootOptions);
     }
 
     public static function audit(): array{

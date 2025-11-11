@@ -2,7 +2,7 @@
 
 namespace pms\contract;
 /**
- * @method static start
+ * @method static entry
  */
 interface LifecycleInterface
 {

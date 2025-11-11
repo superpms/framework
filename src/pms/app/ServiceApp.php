@@ -28,4 +28,17 @@ abstract class ServiceApp implements LifecycleInterface
 	 */
 	public static bool $ignore = false;
 	
+	
+	/**
+	 * 当 $adapter 不为false时,服务将切换为连接器应用
+	 * @var bool $ignore
+	 */
+	public static false|string $adapter = false;
+	
+	
+	public function __toString(): string
+	{
+		return static::class;
+	}
+	
 }

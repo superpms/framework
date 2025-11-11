@@ -10,7 +10,10 @@ class Boot
     protected Options $bootOptions;
 
     public function __construct(protected string $rootPath = ""){
-
+		if(empty($rootPath)){
+			// 向上4层
+			$this->rootPath = path_join(dirname(__DIR__),'..','..','..','..');
+		}
         set_error_handler('custom_error_handler');
         /**
          * 初始系统引导文件

@@ -3,10 +3,10 @@
 namespace pms\hook;
 
 use pms\Container;
-use pms\contract\HookInterface;
+use pms\contract\HookAppInterface;
 use ReflectionClass;
 
-class AnnotationClassHook implements HookInterface
+class AnnotationClassHook implements HookAppInterface
 {
 
     protected static array $container = [];

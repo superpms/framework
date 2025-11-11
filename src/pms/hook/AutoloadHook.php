@@ -2,10 +2,10 @@
 
 namespace pms\hook;
 
-use pms\contract\HookInterface;
+use pms\contract\HookAppInterface;
 use pms\facade\Path;
 
-class AutoloadHook implements HookInterface
+class AutoloadHook implements HookAppInterface
 {
 
     protected static array $container = [];

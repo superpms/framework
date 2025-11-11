@@ -71,20 +71,22 @@ if (!function_exists('is_dev')) {
     }
 }
 
+if(defined('DIRECTORY_SEPARATOR_REVERSE')){
+	define('DIRECTORY_SEPARATOR_REVERSE', DIRECTORY_SEPARATOR === '/' ? '\\' : '/');
+}
+
 if (!function_exists('path_join')) {
     function path_join(...$segments): string
     {
-        $symbol = DIRECTORY_SEPARATOR;
-        $noSymbol = $symbol === '/' ? '\\' : '/';
         $segments = array_filter($segments);
-        $path = array_map(function ($segment) use ($symbol, $noSymbol) {
+        $path = array_map(function ($segment){
             if (is_array($segment)) {
                 $segment = path_join(...$segment);
             }
-            return str_replace($noSymbol, $symbol, $segment);
+            return str_replace(DIRECTORY_SEPARATOR_REVERSE, DIRECTORY_SEPARATOR, $segment);
         }, $segments);
 
-        $parts = explode($symbol, join($symbol, $path));
+        $parts = explode(DIRECTORY_SEPARATOR, join(DIRECTORY_SEPARATOR, $path));
         $stack = [];
 
         foreach ($parts as $key => $part) {
@@ -100,7 +102,7 @@ if (!function_exists('path_join')) {
             $stack[] = $part;
         }
         // 重新组合路径
-        return implode($symbol, $stack);
+        return implode(DIRECTORY_SEPARATOR, $stack);
     }
 }
 if (!function_exists('path_class')) {
