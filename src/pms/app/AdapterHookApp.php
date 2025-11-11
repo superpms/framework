@@ -9,7 +9,8 @@ use pms\contract\HookAppInterface;
  * 连接器钩子应用
  * @note 连接器和生命周期的区别是：
  *       生命周期：到达某个生命周期时，触发当前生命周期下的所有钩子
- *       连接器：到达某个生命周期时，仅触发当前连接点下的所所有钩子,控制更加精细。
+ *       连接器：到达某个生命周期时，仅触发当前连接点下的钩子,控制更加精细。
+ *       连接器：同一个生命周期下的同一个连接器只能挂载一个,重复挂载会覆盖
  */
 abstract class AdapterHookApp implements HookAppInterface
 {
@@ -40,24 +41,19 @@ abstract class AdapterHookApp implements HookAppInterface
 				return false;
 			}
 		}
-		if (!isset(static::$container[$lifecycle][$adapter])) {
-			static::$container[$lifecycle][$adapter] = [];
-		}
-		static::$container[$lifecycle][$adapter][] = $callable;
+		static::$container[$lifecycle][$adapter] = $callable;
 		return true;
 	}
 	
-	public static function run(string $lifecycle, string $adapter, ...$args): void
+	public static function run(string $lifecycle, string $adapter, ...$args)
 	{
 		if (!array_key_exists($lifecycle, static::$container)) {
-			return;
+			return false;
 		}
 		if (!array_key_exists($adapter, static::$container[$lifecycle])) {
-			return;
+			return false;
 		}
-		foreach (static::$container[$lifecycle][$adapter] as $closure) {
-			call_user_func_array($closure, $args);
-		}
+		return call_user_func_array(static::$container[$lifecycle][$adapter], $args);
 	}
 	
 	public static function audit()
