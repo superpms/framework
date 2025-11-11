@@ -60,6 +60,11 @@ abstract class AdapterHookAppApp implements HookAppInterface
 		}
 	}
 	
+	public static function audit()
+	{
+		return static::$container;
+	}
+	
 	public function __toString(): string
 	{
 		return static::class;
