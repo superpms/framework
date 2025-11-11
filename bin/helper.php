@@ -71,7 +71,7 @@ if (!function_exists('is_dev')) {
     }
 }
 
-if(defined('DIRECTORY_SEPARATOR_REVERSE')){
+if(!defined('DIRECTORY_SEPARATOR_REVERSE')){
 	define('DIRECTORY_SEPARATOR_REVERSE', DIRECTORY_SEPARATOR === '/' ? '\\' : '/');
 }
 
