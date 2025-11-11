@@ -11,7 +11,7 @@ use pms\contract\HookAppInterface;
  *       生命周期：到达某个生命周期时，触发当前生命周期下的所有钩子
  *       连接器：到达某个生命周期时，仅触发当前连接点下的所所有钩子,控制更加精细。
  */
-abstract class AdapterHookAppApp implements HookAppInterface
+abstract class AdapterHookApp implements HookAppInterface
 {
 	protected static array $container = [];
 	
