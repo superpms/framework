@@ -32,9 +32,6 @@ abstract class AdapterApp implements HookAppInterface
 		if (!is_array(static::$container[$lifecycle])) {
 			static::$container[$lifecycle] = [];
 		}
-		if ($adapter !== '') {
-			return false;
-		}
 		if (!is_callable($callable)) {
 			$callable = [$callable, 'entry'];
 			if (!is_callable($callable)) {
@@ -56,7 +53,7 @@ abstract class AdapterApp implements HookAppInterface
 		return call_user_func_array(static::$container[$lifecycle][$adapter], $args);
 	}
 	
-	public static function audit()
+	public static function audit(): array
 	{
 		return static::$container;
 	}
