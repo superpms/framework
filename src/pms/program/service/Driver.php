@@ -59,16 +59,20 @@ class Driver
 		$hook = $item::$hookClass;
 		$lifecycle = $item::$lifecycle;
 		$adapter = $item::$adapter;
+		$fn = [$item, 'entry'];
+		if(!is_callable($fn)){
+			throw new \Exception("service {$item}:static function 'entry' is not exists");
+		}
 		if ($adapter === false) {
 			if (!is_subclass_of($hook, LifecycleHookApp::class)) {
 				throw new \Exception("service {$item}: {$hook} is not a LifecycleHookApp");
 			}
-			$hook::mount($lifecycle, [$item, 'entry']);
+			$hook::mount($lifecycle, $fn);
 		} else {
 			if (!is_subclass_of($hook, AdapterApp::class)) {
 				throw new \Exception("service {$item}: {$hook} is not a AdapterHookApp");
 			}
-			$hook::mount($lifecycle, $adapter, [$item, 'entry']);
+			$hook::mount($lifecycle, $adapter, $fn);
 		}
 		return true;
 	}
