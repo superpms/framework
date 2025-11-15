@@ -96,10 +96,7 @@ class Driver
 	 * @param  array  $array
 	 */
 	public function init(array $array): void{
-		$this->services = [
-			...$array,
-			...$this->services
-		];
+	
 		foreach ($array as $key => $item) {
 			$this->register($item, is_numeric($key) ? '' : $key);
 		}
