@@ -496,14 +496,14 @@ if (!function_exists('file_create')) {
     }
 }
 
-if (!function_exists('annotate_attrs')) {
+if (!function_exists('class_annotate_attrs')) {
     /**
      * @param ReflectionClass $class
      * @param string $name
      * @param bool $final 是否只返回最后一项
      * @return ReflectionAttribute|ReflectionAttribute[]
      */
-    function annotate_attrs(ReflectionClass $class, string $name, bool $final = false): array|ReflectionAttribute
+    function class_annotate_attrs(ReflectionClass $class, string $name, bool $final = false): array|ReflectionAttribute
     {
         // 获取当前类的属性
         $attrs = $class->getAttributes($name);
@@ -512,7 +512,7 @@ if (!function_exists('annotate_attrs')) {
         }
         // 获取当前类 所有 trait 中的注解属性
         foreach (array_reverse($class->getTraits()) as $trait) {
-            $child = annotate_attrs($trait, $name, $final);
+            $child = class_annotate_attrs($trait, $name, $final);
             $child = $final ? [$child] : $child;
             $attrs = [
                 ...$child,
@@ -525,7 +525,7 @@ if (!function_exists('annotate_attrs')) {
 
         $class = $class->getParentClass();
         if ($class) {
-            $child = annotate_attrs($class, $name, $final);
+            $child = class_annotate_attrs($class, $name, $final);
             $child = $final ? [$child] : $child;
             $attrs = [
                 ...$child,
