@@ -355,8 +355,16 @@ if (!function_exists('str_to_fn')) {
                 case "JSONSTRTOARR":
                 case "JSONSTRINGTOARRAY":
                 case "JSONSTRINGTOARR":
-                    if (is_string($value)) {
+                    if (is_string($value) && json_validate($value)) {
                         $value = json_decode($value, true);
+                    }
+                    break;
+                case "JSONSTRTOOBJECT":
+                case "JSONSTRTOOBJ":
+                case "JSONSTRINGTOOBJECT":
+                case "JSONSTRINGTOOBJ":
+                    if (is_string($value) && json_validate($value)) {
+                        $value = json_decode($value);
                     }
                     break;
                 case 'PARSESTR':
