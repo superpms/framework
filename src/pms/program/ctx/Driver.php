@@ -4,22 +4,26 @@ namespace pms\program\ctx;
 
 class Driver
 {
-
+    
     protected \Closure $getFnc;
     protected \Closure $setFnc;
     protected \Closure $hasFnc;
-
+    
     protected array $container = [];
-
-
+    
+    
     public function __construct(){
         if (in_swoole()) {
             $context = \Swoole\Coroutine::getContext(\Swoole\Coroutine::getCid());
             $context['global'] = [];
             $this->setFnc = function (string $key, mixed $value) use ($context) {
                 $context['global'][$key] = $value;
+                return $this;
             };
-            $this->getFnc = function (string $key, mixed $default = null) use ($context) {
+            $this->getFnc = function (string $key='', mixed $default = null) use ($context) {
+                if($key === ''){
+                    return $context['global'] ?? $default;
+                }
                 return $context['global'][$key] ?? $default;
             };
             $this->hasFnc = function (string $key) use ($context) {
@@ -28,8 +32,12 @@ class Driver
         } else {
             $this->setFnc = function (string $key, mixed $value) {
                 $this->container[$key] = $value;
+                return $this;
             };
-            $this->getFnc = function (string $key, mixed $default = null) {
+            $this->getFnc = function (string $key='', mixed $default = null) {
+                if($key === ''){
+                    return empty($this->container) ? $default : $this->container;
+                }
                 return $this->container[$key] ?? $default;
             };
             $this->hasFnc = function (string $key) {
@@ -37,23 +45,39 @@ class Driver
             };
         }
     }
-
-    public function set(string $key, mixed $value)
-    {
+    
+    public function set(string $key, mixed $value): static {
+        $key = strtoupper($key);
         $fnc = $this->setFnc;
         return $fnc($key, $value);
     }
-
-    public function get(string $key, mixed $default = null)
+    
+    public function get(string $key='', mixed $default = null)
     {
+        $key = strtoupper($key);
         $fnc = $this->getFnc;
         return $fnc($key, $default);
     }
-
+    
     public function has(string $key)
     {
+        $key = strtoupper($key);
         $fnc = $this->hasFnc;
         return $fnc($key);
     }
-
+    
+    public function __call(string $name, array $arguments) {
+        if (str_starts_with($name, 'get') && strlen($name) > 3) {
+            $name = substr($name, 3);
+            return $this->get($name, $arguments[0] ?? null);
+        } else if (str_starts_with($name, 'set') && strlen($name) > 3) {
+            $name = substr($name, 3);
+            return $this->set($name, $arguments[0]);
+        } else if (str_starts_with($name, 'has') && strlen($name) > 3) {
+            $name = substr($name, 3);
+            return $this->has($name);
+        } else {
+            throw new \Exception("method $name not exists");
+        }
+    }
 }
