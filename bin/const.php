@@ -14,6 +14,12 @@ const JPEG_CONTENT_TYPE = 'image/jpeg';
 const MPEG_CONTENT_TYPE = 'audio/mpeg';
 
 /**
+ * 当执行一个 callable 函数时,用于替换成实际参数值的占位符(symbol)
+ */
+const ARG_VALUE_SYMBOL = '$${ARG_VALUE_SYMBOL}$$';
+
+
+/**
  * Lifecycle：启动
  */
 const LIFECYCLE_BOOT = 'LIFECYCLE_BOOT';
