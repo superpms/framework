@@ -18,9 +18,9 @@ abstract class ServiceApp implements LifecycleInterface
 	
 	/**
 	 * $hookClass 中对应的 生命周期
-	 * @var string $lifecycle
+	 * @var string|array $lifecycle
 	 */
-	public static string $lifecycle;
+	public static string|array $lifecycle;
 	
 	/**
 	 * 当 $hookClass 不存在时是否忽略
