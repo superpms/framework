@@ -18,9 +18,9 @@ abstract class ServiceApp implements LifecycleInterface
 	
 	/**
 	 * $hookClass 中对应的 生命周期
-	 * @var string|array $lifecycle
+	 * @var string $lifecycle
 	 */
-	public static string|array $lifecycle;
+	public static string $lifecycle;
 	
 	/**
 	 * 当 $hookClass 不存在时是否忽略
@@ -33,7 +33,7 @@ abstract class ServiceApp implements LifecycleInterface
 	 * 当 $adapter 不为false时,服务将切换为连接器应用
 	 * @var bool $adapter
 	 */
-	public static false|string $adapter = false;
+	public static false|string|array $adapter = false;
 	
 	
 	public function __toString(): string

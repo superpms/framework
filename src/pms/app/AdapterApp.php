@@ -15,16 +15,16 @@ use pms\contract\HookAppInterface;
 abstract class AdapterApp implements HookAppInterface
 {
 	protected static array $container = [];
-	
-	/**
-	 * 挂载生命周期连接器
-	 * @note 默认无法挂载至不存在的生命周期
-	 * @param  string           $lifecycle  生命周期
-	 * @param  callable|string  $callable   连接器回调方法
-	 * @param  string           $adapter    连接器名称
-	 * @return bool
-	 */
-	public static function mount(string $lifecycle, string $adapter, callable|string $callable): bool
+    
+    /**
+     * 挂载生命周期连接器
+     * @note 默认无法挂载至不存在的生命周期
+     * @param  string           $lifecycle  生命周期
+     * @param  string|array     $adapters    连接器名称
+     * @param  callable|string  $callable   连接器回调方法
+     * @return bool
+     */
+	public static function mount(string $lifecycle, string|array $adapters, callable|string $callable): bool
 	{
 		if (!array_key_exists($lifecycle, static::$container)) {
 			return false;
@@ -38,7 +38,12 @@ abstract class AdapterApp implements HookAppInterface
 				return false;
 			}
 		}
-		static::$container[$lifecycle][$adapter] = $callable;
+        if(is_string($adapters)){
+            $adapters = [$adapters];
+        }
+        foreach ($adapters as $adapter){
+            static::$container[$lifecycle][$adapter] = $callable;
+        }
 		return true;
 	}
 	
