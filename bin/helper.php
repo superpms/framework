@@ -577,3 +577,79 @@ if (!function_exists('call_php_script')) {
         pclose($handle);
     }
 }
+
+
+
+if (!function_exists('transform_callable_plus')) {
+    /**
+     * 将 callable/callablePlus 统一转换为 callablePlus 可执行对象
+     * @param  mixed  $value
+     * @return false|array
+     */
+    function transform_callable_plus(mixed $value): false|array {
+        if (is_callable($value)) {
+            return [$value];
+        }
+        if (is_string($value)) {
+            if (class_exists($value)) {
+                return [new $value()];
+            }
+        }
+        if (is_array($value)) {
+            $fn = array_shift($value);
+            if (is_callable($fn)) {
+                return [$fn, ...$value];
+            }
+            if (class_exists($fn)) {
+                return [new $fn(), ...$value];
+            }
+            if (count($value) > 0) {
+                $fnName = array_shift($value);
+                if (is_callable([$fn, $fnName])) {
+                    return [[$fn, $fnName], ...$value];
+                }
+            }
+        }
+        return false;
+    }
+}
+
+
+
+if (!function_exists('is_callable_plus')) {
+    /**
+     * 判断是否为CallablePlus可执行对象
+     * @param  mixed  $value
+     * @return bool
+     */
+    function is_callable_plus(mixed $value): bool {
+        if (empty($value)) {
+            return false;
+        }
+        if (!is_array($value)) {
+            return false;
+        }
+        return is_callable($value[0]);
+    }
+}
+
+
+if (!function_exists('callable_plus')) {
+    /**
+     * 执行CallablePlus可执行对象
+     * @param  mixed  $value
+     * @param  bool   $validate  是否进行验证(若提前已经验证,可传入false,减少性能开销)
+     * @return mixed
+     * @throws Exception
+     */
+    function callable_plus(mixed $value,bool $validate = true): mixed {
+        if ($validate && !is_callable_plus($value)) {
+            throw new \Exception("Not a callable plus");
+        }
+        $call = function (callable $fn, ...$args) {
+            return call_user_func_array($fn, $args);
+        };
+        return $call(...$value);
+    }
+    
+}
