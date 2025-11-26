@@ -628,7 +628,14 @@ if (!function_exists('callable_plus')) {
 }
 
 if (!function_exists('value_compare')) {
-    function value_compare($value1, $symbol, $value2): bool {
+    /**
+     * 比较两个值
+     * @param  mixed   $value1
+     * @param  string  $symbol
+     * @param  mixed   $value2
+     * @return bool
+     */
+    function value_compare(mixed $value1, string $symbol, mixed $value2): bool {
         return match ($symbol) {
             '=', '==', 'equal', 'eq'        => $value1 == $value2,
             '===', 'identical'              => $value1 === $value2,
