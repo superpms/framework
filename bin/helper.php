@@ -33,7 +33,7 @@ if (!function_exists('json_validate')) {
     /**
      * 判断是否为有效json数据
      *
-     * @param  string  $string  数据
+     * @param string $string 数据
      * @return bool
      */
     function json_validate(string $string): bool {
@@ -71,26 +71,28 @@ if (!defined('DIRECTORY_SEPARATOR_REVERSE')) {
 if (!function_exists('path_join')) {
     function path_join(...$segments): string {
         $segments = array_filter($segments);
-        $path = array_map(function ($segment) {
-            if (is_array($segment)) {
-                $segment = path_join(...$segment);
-            }
-            return str_replace(DIRECTORY_SEPARATOR_REVERSE, DIRECTORY_SEPARATOR, $segment);
-        }, $segments);
-        
+        $path     = array_map(
+            function ($segment) {
+                if (is_array($segment)) {
+                    $segment = path_join(...$segment);
+                }
+                return str_replace(DIRECTORY_SEPARATOR_REVERSE, DIRECTORY_SEPARATOR, $segment);
+            }, $segments
+        );
+
         $parts = explode(DIRECTORY_SEPARATOR, join(DIRECTORY_SEPARATOR, $path));
         $stack = [];
-        
+
         foreach ($parts as $key => $part) {
             // 忽略空段和当前目录
             if (($key !== 0 && $part === '') || $part === '.') continue;
-            
+
             // 处理上级目录
             if ($part === '..') {
                 if (!empty($stack)) array_pop($stack);
                 continue;
             }
-            
+
             $stack[] = $part;
         }
         // 重新组合路径
@@ -107,7 +109,7 @@ if (!function_exists('path_class')) {
 if (!function_exists('array_chain')) {
     function array_chain(array $data, string $chain, string $chainLevelStr = '.') {
         $tmp = $data;
-        $fA = explode($chainLevelStr, $chain);
+        $fA  = explode($chainLevelStr, $chain);
         for ($i = 0; $i < count($fA); $i++) {
             $key = $fA[$i];
             if (isset($tmp[$key])) {
@@ -121,9 +123,9 @@ if (!function_exists('array_chain')) {
 }
 if (!function_exists('array_chain_set')) {
     function array_chain_set(array &$data, string $chain, mixed $value, string $chainLevelStr = '.'): void {
-        $result = &$data;
+        $result  = &$data;
         $current = &$result;
-        
+
         $fA = explode($chainLevelStr, $chain);
         if (count($fA) === 1) {
             $result[$chain] = $value;
@@ -162,7 +164,7 @@ if (!function_exists('array_to_xml')) {
                 }
             }
         }
-        
+
         $xml = new \SimpleXMLElement('<' . $root . '/>');
         arrayToXml($array, $xml);
         return $xml->saveXML();
@@ -213,9 +215,9 @@ if (!function_exists('config_load_ini')) {
         if (!is_file($file)) {
             return [];
         }
-        $file = file_get_contents($file);
+        $file    = file_get_contents($file);
         $fileArr = explode("\r\n", $file);
-        
+
         $fileStr = "";
         foreach ($fileArr as $value) {
             if (str_starts_with($value, '#')) {
@@ -223,9 +225,9 @@ if (!function_exists('config_load_ini')) {
             }
             $fileStr .= $value . "\r\n";
         }
-        
+
         $info = parse_ini_string($fileStr, true, INI_SCANNER_TYPED);
-        
+
         if ($info === false) {
             return [];
         }
@@ -262,9 +264,9 @@ if (!function_exists('load_file_config')) {
         foreach ($filePath as $file) {
             $name = pathinfo($file, PATHINFO_FILENAME);
             if (is_file($file)) {
-                $name = strtolower($name);
+                $name      = strtolower($name);
                 $extension = pathinfo($file, PATHINFO_EXTENSION);
-                $tmp = [];
+                $tmp       = [];
                 switch ($extension) {
                     case 'php':
                         $tmp = config_load_php($file);
@@ -374,8 +376,8 @@ if (!function_exists('str_to_fn')) {
 if (!function_exists('bit_or')) {
     /**
      * 分离或运算和值
-     * @param  array  $keyMap  或运算索引表(所有能进行或运算的原子值集合)[1,2,4,...]
-     * @param  int    $value   和值(通过索引表中包含的数进行的任意或运算)
+     * @param array $keyMap 或运算索引表(所有能进行或运算的原子值集合)[1,2,4,...]
+     * @param int   $value  和值(通过索引表中包含的数进行的任意或运算)
      * @return array
      */
     function bit_or(array $keyMap, int $value): array {
@@ -392,8 +394,8 @@ if (!function_exists('bit_or')) {
 if (!function_exists('valid_datatype_or')) {
     /**
      * 验证数据类型(或)
-     * @param  string|array  $type   数据类型(传入数组 或 用 | 分割多个类型)
-     * @param  mixed         $datum  数据
+     * @param string|array $type  数据类型(传入数组 或 用 | 分割多个类型)
+     * @param mixed        $datum 数据
      * @return bool
      */
     function valid_datatype_or(string|array $type, mixed $datum): bool {
@@ -446,8 +448,8 @@ if (!function_exists('valid_datatype_or')) {
 if (!function_exists('dir_create')) {
     /**
      * 创建文件夹
-     * @param  string  $path         文件夹地址
-     * @param  int     $permissions  权限, 默认0777
+     * @param string $path        文件夹地址
+     * @param int    $permissions 权限, 默认0777
      * @return bool
      */
     function dir_create(string $path, int $permissions = 0777): bool {
@@ -461,9 +463,9 @@ if (!function_exists('dir_create')) {
 if (!function_exists('file_create')) {
     /**
      * 创建文件
-     * @param  string  $path  文件地址
-     * @param  string  $data  文件数据
-     * @param  string  $mode  文件模式, 默认w，可选w,a,,x,
+     * @param string $path    文件地址
+     * @param string $data    文件数据
+     * @param string $mode    文件模式, 默认w，可选w,a,,x,
      *                        ‘w'：创建文件。如果文件存在则覆盖内容。
      *                        ‘a'：创建文件。如果文件存在则追加内容。
      *                        ‘x'：创建文件，在文件不存在时才创建。
@@ -483,9 +485,9 @@ if (!function_exists('file_create')) {
 
 if (!function_exists('class_annotate_attrs')) {
     /**
-     * @param  ReflectionClass  $class
-     * @param  string           $name
-     * @param  bool             $final  是否只返回最后一项
+     * @param ReflectionClass $class
+     * @param string          $name
+     * @param bool            $final 是否只返回最后一项
      * @return ReflectionAttribute|ReflectionAttribute[]
      */
     function class_annotate_attrs(ReflectionClass $class, string $name, bool $final = false): array|ReflectionAttribute {
@@ -557,7 +559,7 @@ if (!function_exists('call_php_script')) {
 if (!function_exists('transform_callable_plus')) {
     /**
      * 将 callable/callablePlus 统一转换为 callablePlus 可执行对象
-     * @param  mixed  $value
+     * @param mixed $value
      * @return false|array
      */
     function transform_callable_plus(mixed $value): false|array {
@@ -592,7 +594,7 @@ if (!function_exists('transform_callable_plus')) {
 if (!function_exists('is_callable_plus')) {
     /**
      * 判断是否为CallablePlus可执行对象
-     * @param  mixed  $value
+     * @param mixed $value
      * @return bool
      */
     function is_callable_plus(mixed $value): bool {
@@ -610,8 +612,8 @@ if (!function_exists('is_callable_plus')) {
 if (!function_exists('callable_plus')) {
     /**
      * 执行CallablePlus可执行对象
-     * @param  mixed  $value
-     * @param  bool   $validate  是否进行验证(若提前已经验证,可传入false,减少性能开销)
+     * @param mixed $value
+     * @param bool  $validate 是否进行验证(若提前已经验证,可传入false,减少性能开销)
      * @return mixed
      * @throws Exception
      */
@@ -624,28 +626,30 @@ if (!function_exists('callable_plus')) {
         };
         return $call(...$value);
     }
-    
+
 }
 
 if (!function_exists('value_compare')) {
     /**
      * 比较两个值
-     * @param  mixed   $value1
-     * @param  string  $symbol
-     * @param  mixed   $value2
+     * @param mixed  $value1
+     * @param string $symbol
+     * @param mixed  $value2
      * @return bool
      */
     function value_compare(mixed $value1, string $symbol, mixed $value2): bool {
         return match ($symbol) {
-            '=', '==', 'equal', 'eq'        => $value1 == $value2,
-            '===', 'identical'              => $value1 === $value2,
-            '!=', '<>', 'not-equal', 'neq'  => $value1 != $value2,
-            '!==', 'not_identical'          => $value1 !== $value2,
-            '>', 'greater'                  => $value1 > $value2,
-            '<', 'less'                     => $value1 < $value2,
-            '>=', 'greater_equal'           => $value1 >= $value2,
-            '<=', 'less_equal'              => $value1 <= $value2,
-            default => throw new InvalidArgumentException("不支持的比较符号: $symbol"),
+            '=', '==', 'equal', 'eq'                => $value1 == $value2,
+            '===', 'identical'                      => $value1 === $value2,
+            '!=', '<>', 'not-equal', 'neq'          => $value1 != $value2,
+            '!==', 'not_identical', 'not identical' => $value1 !== $value2,
+            '>', 'greater'                          => $value1 > $value2,
+            '<', 'less'                             => $value1 < $value2,
+            '>=', 'greater_equal', 'greater equal'  => $value1 >= $value2,
+            '<=', 'less_equal', 'less equal'        => $value1 <= $value2,
+            'in'                                    => in_array($value1, $value2),
+            'not_in', 'not in'                      => !in_array($value1, $value2),
+            default                                 => throw new InvalidArgumentException("不支持的比较符号: $symbol"),
         };
     }
 }
