@@ -16,7 +16,7 @@ use Throwable;
 
 class ClassNotFoundException extends RuntimeException
 {
-    public function __construct(protected string $class = '', Throwable $previous = null)
+    public function __construct(protected string $class = '', ?Throwable $previous = null)
     {
         parent::__construct('class not exists: '.$class, 0, $previous);
     }

@@ -7,5 +7,5 @@ interface InterpreterAppInterface{
     /**
      * @return mixed|null 应用入口函数
      */
-    public static function entry(\pms\program\boot\Options $bootOptions): mixed;
+    public static function entry(): mixed;
 }

@@ -18,7 +18,7 @@ class InterpreterHook implements HookAppInterface{
         return false;
     }
 
-    public static function run(string $interpreterName,\pms\program\boot\Options $bootOptions): mixed{
+    public static function run(string $interpreterName): mixed{
         if (!isset(static::$container[$interpreterName])) {
             exit("解释器 [{$interpreterName}] 未安装");
         }
@@ -26,7 +26,7 @@ class InterpreterHook implements HookAppInterface{
          * @var InterpreterApp $server;
          */
         $server = static::$container[$interpreterName];
-        return $server::entry($bootOptions);
+        return $server::entry();
     }
 
     public static function audit(): array{

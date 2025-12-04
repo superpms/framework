@@ -106,5 +106,10 @@ class Driver
 		}
 	}
 
+    public function audit(): array
+    {
+        return $this->services;
+    }
+
 	
 }

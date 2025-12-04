@@ -10,31 +10,39 @@ class Driver
     protected \Closure $hasFnc;
     
     protected array $container = [];
-    
-    
+
     public function __construct(){
         if (in_swoole()) {
-            $context = \Swoole\Coroutine::getContext(\Swoole\Coroutine::getCid());
-            $context['global'] = [];
-            $this->setFnc = function (string $key, mixed $value) use ($context) {
-                $context['global'][$key] = $value;
+            $this->setFnc = function (string $key, mixed $value){
+                $cid = \Swoole\Coroutine::getCid();
+                if($cid === -1){
+                    $this->container[$key] = $value;
+                }else{
+                    $context = \Swoole\Coroutine::getContext($cid);
+                    if(!isset($context['global'])){
+                        $context['global'] = [];
+                    }
+                    $context['global'][$key] = $value;
+                }
                 return $this;
             };
-            $this->getFnc = function (string $key='', mixed $default = null) use ($context) {
+            $this->getFnc = function (?string $key='', mixed $default = null) {
+                $data = $this->getRealContainer();
                 if($key === ''){
-                    return $context['global'] ?? $default;
+                    return $data ?? $default;
                 }
-                return $context['global'][$key] ?? $default;
+                return $data[$key] ?? $default;
             };
-            $this->hasFnc = function (string $key) use ($context) {
-                return array_key_exists($key, $context['global']);
+            $this->hasFnc = function (string $key){
+                $data = $this->getRealContainer();
+                return array_key_exists($key, $data);
             };
         } else {
             $this->setFnc = function (string $key, mixed $value) {
                 $this->container[$key] = $value;
                 return $this;
             };
-            $this->getFnc = function (string $key='', mixed $default = null) {
+            $this->getFnc = function (?string $key='', mixed $default = null) {
                 if($key === ''){
                     return empty($this->container) ? $default : $this->container;
                 }
@@ -78,6 +86,23 @@ class Driver
             return $this->has($name);
         } else {
             throw new \Exception("method $name not exists");
+        }
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getRealContainer(): mixed
+    {
+        $cid = \Swoole\Coroutine::getCid();
+        if ($cid === -1) {
+            return $this->container;
+        } else {
+            $context = \Swoole\Coroutine::getContext($cid);
+            if (!isset($context['global'])) {
+                return [];
+            }
+            return $context['global'];
         }
     }
 }

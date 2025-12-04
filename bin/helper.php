@@ -4,9 +4,26 @@ use pms\facade\Path;
 
 if (!function_exists('custom_error_handler')) {
     function custom_error_handler($errno, $errstr, $errfile, int $errline) {
-        throw new \pms\exception\WarningException($errno, $errstr, $errfile, $errline);
+        throw new \pms\exception\ErrorException($errno, $errstr, $errfile, $errline);
     }
 }
+
+function pms_error_set(Throwable $exception): void
+{
+    \pms\facade\Ctx::set('error', $exception);
+    \pms\broadcast\SystemErrorBroadcast::trigger();
+}
+
+function pms_error(): null|Throwable
+{
+    return \pms\facade\Ctx::get('error');
+}
+
+function pms_error_clear(): void
+{
+    \pms\facade\Ctx::set('error', null);
+}
+
 
 if (!function_exists('dd')) {
     function dd(mixed ...$vars): void {
@@ -54,7 +71,7 @@ if (!function_exists('in_swoole')) {
 }
 
 if (!function_exists('config')) {
-    function config(string $name = null, $default = null) {
+    function config(?string $name = null, $default = null) {
         return \pms\facade\Config::get($name, $default);
     }
 }

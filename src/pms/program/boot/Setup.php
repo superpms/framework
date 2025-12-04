@@ -5,6 +5,7 @@ namespace pms\program\boot;
 use pms\annotate\Inject;
 use pms\Container;
 use pms\contract\LifecycleInterface;
+use pms\facade\BootOptions;
 use pms\facade\Config;
 use pms\facade\Path;
 use pms\facade\Service;
@@ -16,7 +17,7 @@ class  Setup implements LifecycleInterface
 	
 	protected static string $rootPath;
 	
-	public static function entry(string $rootPath, Options $bootOptions): void
+	public static function entry(string $rootPath): void
 	{
 		
 		static::$rootPath = $rootPath;
@@ -24,27 +25,27 @@ class  Setup implements LifecycleInterface
 		/**
 		 * 初始化路径导航系统
 		 */
-		static::initPath($bootOptions);
+		static::initPath();
 		
 		/**
 		 * 项目级 PHP配置覆盖
 		 */
-		static::initPhpIni($bootOptions);
+		static::initPhpIni();
 		
 		/**
 		 * PHP扩展验证
 		 */
-		static::validatePhpExtension($bootOptions);
+		static::validatePhpExtension();
 		
 		/**
 		 * PHP函数验证
 		 */
-		static::validatePhpFunction($bootOptions);
+		static::validatePhpFunction();
 		
 		/**
 		 * 初始化自动导入文件
 		 */
-		static::initAutoload($bootOptions);
+		static::initAutoload();
 		
 		/**
 		 * 初始化系项目配置
@@ -63,30 +64,28 @@ class  Setup implements LifecycleInterface
 		
 	}
 	
-	protected static function initPhpIni(Options $bootOptions): void
+	protected static function initPhpIni(): void
 	{
-		date_default_timezone_set($bootOptions->timezone);
-		foreach ($bootOptions->php_ini as $key => $item) {
+		date_default_timezone_set(BootOptions::get_timezone());
+		foreach (BootOptions::get_php_ini() as $key => $item) {
 			ini_set($key, $item);
 		}
-		if (!$bootOptions->error_debug) {
+		if (!BootOptions::get_error_debug()) {
 			ini_set('display_errors', 'Off');
 		}
-		if ($bootOptions->log_debug) {
+		if (BootOptions::get_log_debug()) {
 			ini_set('log_errors', 'On');
 			ini_set('error_log', Path::getRuntime('/base/error.log'));
 		}
 	}
 	
-	protected static function initPath(Options $bootOptions): void
+	protected static function initPath(): void
 	{
-		$vendorPath = realpath(dirname(__DIR__));
-		static::$rootPath = static::$rootPath !== "" ? static::$rootPath : rtrim(dirname($vendorPath, 4), DIRECTORY_SEPARATOR);
 		Path::init([
 			'root' => static::$rootPath,
-			'app' => path_join(static::$rootPath, $bootOptions->dir_app),
-			'config' => path_join(static::$rootPath, $bootOptions->dir_config),
-			'runtime' => path_join(static::$rootPath, $bootOptions->dir_runtime),
+			'app' => path_join(static::$rootPath, BootOptions::get_dir_app()),
+			'config' => path_join(static::$rootPath, BootOptions::get_dir_config()),
+			'runtime' => path_join(static::$rootPath, BootOptions::get_dir_runtime()),
 		]);
 		$paths = [
 			Path::getRuntime('/app'),
@@ -102,9 +101,9 @@ class  Setup implements LifecycleInterface
 		}
 	}
 	
-	protected static function initAutoload(Options $bootOptions): void
+	protected static function initAutoload(): void
 	{
-		AutoloadHook::mount($bootOptions->autoload);
+		AutoloadHook::mount(BootOptions::get_autoload());
 		AutoloadHook::run();
 	}
 	
@@ -133,17 +132,17 @@ class  Setup implements LifecycleInterface
 			});
 	}
 	
-	public static function validatePhpFunction(Options $bootOptions): void
+	public static function validatePhpFunction(): void
 	{
-		foreach ($bootOptions->php_function as $item) {
+		foreach (BootOptions::get_php_function() as $item) {
 			if (!str_starts_with($item, '#') && !function_exists($item)) {
 				throw new \Exception("PHP函数 {$item} 无法使用");
 			}
 		}
 	}
 	
-	public static function validatePhpExtension(Options $bootOptions): void{
-		foreach ($bootOptions->php_extension as $item) {
+	public static function validatePhpExtension(): void{
+		foreach (BootOptions::get_php_extension() as $item) {
 			if (!str_starts_with($item, '#') && !extension_loaded($item)) {
 				throw new \Exception("PHP扩展 {$item} 尚未安装");
 			}

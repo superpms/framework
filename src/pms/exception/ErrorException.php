@@ -12,16 +12,17 @@
 namespace pms\exception;
 
 use RuntimeException;
+use Throwable;
 
-class WarningException extends RuntimeException
+class ErrorException extends RuntimeException
 {
 
-    public function __construct($errno, $errstr, $errfile, $errline){
-        $this->message = $errstr;
+    public function __construct($errno, $errStr, $errFile, $errLine, ?Throwable $previous = null){
+        $this->message = $errStr;
         $this->code = $errno;
-        $this->file = $errfile;
-        $this->line = $errline;
-        parent::__construct($this->message, $this->code,null);
+        $this->file = $errFile;
+        $this->line = $errLine;
+        parent::__construct($this->message, $this->code,$previous);
     }
 
 }
