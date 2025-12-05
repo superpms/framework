@@ -562,10 +562,19 @@ if (!function_exists('has_process')) {
 }
 
 if (!function_exists('call_php_script')) {
+    /**
+     * php以非阻塞方式调用脚本
+     * @param string $path    脚本路径
+     * @param string $cmd     脚本命令
+     * @param string $logPath 日志路径, 默认/dev/null
+     * @return void
+     */
     function call_php_script(string $path, $cmd, $logPath = null): void {
         if (PHP_OS === 'WINNT') {
+
             $handle = popen("cd {$path} &&start /B $cmd > $logPath", 'r');
         } else {
+
             $logPath = $logPath ?? '/dev/null';
             $handle = popen("cd {$path} && nohup $cmd > $logPath 2>&1 &", 'r');
         }
