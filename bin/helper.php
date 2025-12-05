@@ -66,7 +66,7 @@ if (!function_exists('in_console')) {
 }
 if (!function_exists('in_swoole')) {
     function in_swoole(): bool {
-        return defined('SWOOLE_VERSION') && SWOOLE_VERSION !== null;
+        return in_console() && defined('SWOOLE_VERSION') && SWOOLE_VERSION !== null;
     }
 }
 
