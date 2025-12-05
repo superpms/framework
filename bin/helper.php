@@ -566,6 +566,7 @@ if (!function_exists('call_php_script')) {
         if (PHP_OS === 'WINNT') {
             $handle = popen("cd {$path} &&start /B $cmd > $logPath", 'r');
         } else {
+            $logPath = $logPath ?? '/dev/null';
             $handle = popen("cd {$path} && nohup $cmd > $logPath 2>&1 &", 'r');
         }
         pclose($handle);
