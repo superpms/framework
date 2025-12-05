@@ -15,9 +15,8 @@ use pms\OptionsAccessCfg;
  * @method static \array get_autoload  获取自动加载配置
  * @method static \boolean get_error_debug  获取是否开启错误调试
  * @method static \boolean get_log_debug  获取是否开启日志调试
- * @method static \object  get_php_ini  获取 PHP 配置
- * @method static \array   get_php_function  获取 PHP 函数
- * @method static \array   get_php_extension  获取 PHP 扩展
+ * @method static \object  get_php  获取 PHP 配置
+ * @method static \object  get_php_ini  获取 PHP 运行配置
  */
 class Driver extends OptionsAccessCfg
 {
@@ -32,9 +31,8 @@ class Driver extends OptionsAccessCfg
         $this->autoload = $boot?->autoload ?? [];
         $this->error_debug = $boot?->error_debug ?? true;
         $this->log_debug = $boot?->log_debug ?? false;
+        $this->php = $boot?->php ?? (object)[];
         $this->php_ini = $boot?->php?->ini ?? (object)[];
-        $this->php_function = $boot?->php?->function ?? [];
-        $this->php_extension = $boot?->php?->extension ?? [];
         $this->extend = $boot?->extend ?? (object)[];
     }
 
