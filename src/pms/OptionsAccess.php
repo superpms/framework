@@ -11,13 +11,12 @@ abstract class OptionsAccess implements JsonSerializable, Iterator, ArrayAccess,
 {
 
     protected array $data = [];
-
     protected const upper = false;
     protected const missing = false;
 
     public function toArray(): array
     {
-        return $this->data;
+        return json_decode(json_encode($this->data, 320), true);
     }
 
     public function jsonSerialize(): mixed
@@ -197,8 +196,8 @@ abstract class OptionsAccess implements JsonSerializable, Iterator, ArrayAccess,
             // 处理class所有自带属性
             $tmp = get_object_vars($this);
             unset($tmp['data']);
-            foreach ($tmp as $key => $value){
-               unset($this->$key);
+            foreach ($tmp as $key => $value) {
+                unset($this->$key);
             }
         }
         $real = [
