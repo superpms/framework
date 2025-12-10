@@ -219,16 +219,27 @@ if (!function_exists('object_chain_set')) {
     }
 }
 
-if (!function_exists('config_load_php')) {
-    function config_load_php(string $file) {
+if(!function_exists('load_json_config')){
+    function load_json_config(string $file): array {
+        if (is_file($file)) {
+            $json = file_get_contents($file);
+            if(json_validate($json)){
+                return json_decode($json, true) ?? [];
+            }
+        }
+        return [];
+    }
+}
+if (!function_exists('load_php_config')) {
+    function load_php_config(string $file) {
         if (is_file($file)) {
             return include $file;
         }
         return [];
     }
 }
-if (!function_exists('config_load_ini')) {
-    function config_load_ini(string $file): array {
+if (!function_exists('load_ini_config')) {
+    function load_ini_config(string $file): array {
         if (!is_file($file)) {
             return [];
         }
@@ -273,26 +284,26 @@ if (!function_exists('config_load_ini')) {
     }
 }
 if (!function_exists('load_file_config')) {
-    function load_file_config(string|array $filePath): array {
-        if (is_string($filePath)) {
-            $filePath = [$filePath];
+    function load_file_config(string|array $filePaths): array {
+        if (is_string($filePaths)) {
+            $filePaths = [$filePaths];
         }
         $config = [];
-        foreach ($filePath as $file) {
-            $name = pathinfo($file, PATHINFO_FILENAME);
-            if (is_file($file)) {
+        foreach ($filePaths as $filePath) {
+            $name = pathinfo($filePath, PATHINFO_FILENAME);
+            if (is_file($filePath)) {
                 $name      = strtolower($name);
-                $extension = pathinfo($file, PATHINFO_EXTENSION);
+                $extension = pathinfo($filePath, PATHINFO_EXTENSION);
                 $tmp       = [];
                 switch ($extension) {
                     case 'php':
-                        $tmp = config_load_php($file);
+                        $tmp = load_php_config($filePath);
                         break;
                     case 'json':
-                        $tmp = json_decode(file_get_contents($file), true);
+                        $tmp = load_json_config($filePath);
                         break;
                     case 'ini':
-                        $tmp = config_load_ini($file);
+                        $tmp = load_ini_config($filePath);
                         break;
                 }
                 if (!isset($config[$name])) {
