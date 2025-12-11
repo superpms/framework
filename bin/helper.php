@@ -220,11 +220,11 @@ if (!function_exists('object_chain_set')) {
 }
 
 if(!function_exists('load_json_config')){
-    function load_json_config(string $file): array {
+    function load_json_config(string $file,$associative=true): array {
         if (is_file($file)) {
             $json = file_get_contents($file);
             if(json_validate($json)){
-                return json_decode($json, true) ?? [];
+                return json_decode($json, $associative) ?? [];
             }
         }
         return [];
@@ -232,9 +232,9 @@ if(!function_exists('load_json_config')){
 }
 
 if(!function_exists('save_json_config')){
-    function save_json_config(string $file, array $json, int $flags = 448): false|int
+    function save_json_config(string $file, mixed $value, int $flags = 448): false|int
     {
-        return file_put_contents($file, json_encode($json, $flags));
+        return file_put_contents($file, json_encode($value, $flags));
     }
 }
 
@@ -557,7 +557,7 @@ if (!function_exists('class_annotate_attrs')) {
                 return $attrs[count($attrs) - 1];
             }
         }
-        
+
         $class = $class->getParentClass();
         if ($class) {
             $child = class_annotate_attrs($class, $name, $final);
@@ -571,7 +571,7 @@ if (!function_exists('class_annotate_attrs')) {
             return $attrs[count($attrs) - 1];
         }
         return $attrs;
-        
+
     }
 }
 
