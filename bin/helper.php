@@ -712,3 +712,11 @@ if (!function_exists('value_compare')) {
         };
     }
 }
+
+
+if(!function_exists('is_fullpath')){
+    function is_fullpath(string $url): bool
+    {
+        return filter_var($url, FILTER_VALIDATE_URL) !== false;
+    }
+}
