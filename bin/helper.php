@@ -232,9 +232,9 @@ if(!function_exists('load_json_config')){
 }
 
 if(!function_exists('save_json_config')){
-    function save_json_config(string $file, mixed $value, int $flags = 448): false|int
+    function save_json_config(string $file, mixed $value, int $flags = 448): bool
     {
-        return file_put_contents($file, json_encode($value, $flags));
+        return file_put_contents($file, json_encode($value, $flags)) !== false;
     }
 }
 
