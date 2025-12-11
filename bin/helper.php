@@ -230,6 +230,15 @@ if(!function_exists('load_json_config')){
         return [];
     }
 }
+
+if(!function_exists('save_json_config')){
+    function save_json_config(string $file, array $json): false|int
+    {
+        return file_put_contents($file, json_encode($json, 320));
+    }
+}
+
+
 if (!function_exists('load_php_config')) {
     function load_php_config(string $file) {
         if (is_file($file)) {
@@ -238,6 +247,15 @@ if (!function_exists('load_php_config')) {
         return [];
     }
 }
+if(!function_exists('save_php_config')){
+    function save_php_config(string $file, array $data): bool {
+        $content = "<?php\nreturn " . var_export($data, true) . ";\n";
+        return file_put_contents($file, $content) !== false;
+    }
+}
+
+
+
 if (!function_exists('load_ini_config')) {
     function load_ini_config(string $file): array {
         if (!is_file($file)) {
@@ -283,6 +301,9 @@ if (!function_exists('load_ini_config')) {
         return $tmp;
     }
 }
+
+
+
 if (!function_exists('load_file_config')) {
     function load_file_config(string|array $filePaths): array {
         if (is_string($filePaths)) {
