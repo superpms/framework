@@ -189,6 +189,11 @@ abstract class OptionsAccess implements JsonSerializable, Iterator, ArrayAccess,
         return array_keys($this->data);
     }
 
+    public function has(string $name): bool
+    {
+        return array_key_exists($this->realKey($name), $this->data);
+    }
+
     public function __construct(bool $handleProperty = true)
     {
         $tmp = [];
