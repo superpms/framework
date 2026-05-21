@@ -1,33 +1,53 @@
-superpms basic 1.0
-===============
-superpms 基座
+# superpms/basic
 
-# 特性
-* 基于PHP `8.1+`开发
+`superpms/basic` is the runtime foundation package for SuperPMS composer modules. It provides the boot sequence, global helpers and constants, facades, hook containers, configuration/path/context/service drivers, and the base contracts used by adjacent interpreter and program packages.
 
-> 基座运行环境要求 `php` `8.1.0+`
+This package targets PHP `>=8.2`, registers `pms\` through PSR-4 at `src/pms/`, and loads `bin/autoload.php` through Composer `autoload.files`.
 
-# 文档
-还在编写中，敬请期待...
+## What It Provides
 
-# 安装
+- `pms\Boot` for reading project `boot.json`, initializing runtime options, running boot lifecycle hooks, and dispatching named interpreters.
+- Core facades: `BootOptions`, `Config`, `Ctx`, `Path`, and `Service`.
+- Hook families for lifecycle, interpreter, autoload, class attributes, and property attributes.
+- Base app classes for interpreters, lifecycle hooks, services, adapters, and broadcasts.
+- Container construction, constructor injection, and `#[pms\annotate\Inject]` property injection.
+- Global constants and helpers loaded by Composer.
+
+`basic` does not implement HTTP, terminal, Swoole, database, cache, workflow, shop, user, auth, filesystem, or other business features. Those are provided by the project or adjacent packages that mount into this foundation.
+
+## Documentation
+
+Start with [docs/README.md](docs/README.md).
+
+The detailed docs are organized by module:
+
+- [Getting started](docs/getting-started/installation.md)
+- [Architecture](docs/architecture/boot-lifecycle.md)
+- [Core APIs](docs/core/facades-and-drivers.md)
+- [Extension points](docs/extension-points/hooks.md)
+- [Runtime behavior](docs/runtime/error-handling.md)
+- [Reference](docs/reference/api-map.md)
+
+## Installation
+
 ```bash
 composer require superpms/basic
 ```
 
-## 命名规范
+In a SuperPMS project, this package is usually reached through the project Composer autoloader:
 
-`PmsPHP`遵循PSR-2命名规范和PSR-4自动加载规范。
+```php
+<?php
 
-# 参与开发
-直接提交PR或者Issue即可
+namespace pms;
 
-# 版权信息
+require __DIR__ . '/../vendor/autoload.php';
 
-PmsPHP遵循Apache2开源协议发布，并提供免费使用。
+(new Boot(__DIR__ . '/../'))->http;
+```
 
-本项目包含的第三方源码和二进制文件之版权信息另行标注。
+The `http` or `terminal` interpreter names are not built into this package. They are mounted by interpreter packages with `InterpreterHook`.
 
-版权所有Copyright © 2023-2025 by superpms (http://pmsphp.cn) All rights reserved。
+## License
 
-更多细节参阅 [LICENSE.txt](LICENSE.txt)
+Apache-2.0.
