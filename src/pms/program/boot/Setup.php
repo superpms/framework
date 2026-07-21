@@ -105,6 +105,31 @@ class  Setup implements LifecycleInterface
     {
         AutoloadHook::mount(BootOptions::get_autoload());
         AutoloadHook::run();
+        static::initAppAutoloadFile();
+    }
+
+    /**
+     * 加载 app 模块下的 autoload.php
+     */
+    protected static function initAppAutoloadFile(): void
+    {
+        $appRoot = Path::getApp();
+        if (!is_dir($appRoot)) {
+            return;
+        }
+        foreach (scandir($appRoot) ?: [] as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $moduleDir = path_join($appRoot, $item);
+            if (!is_dir($moduleDir)) {
+                continue;
+            }
+            $autoloadFile = path_join($moduleDir, 'autoload.php');
+            if (is_file($autoloadFile)) {
+                include_once $autoloadFile;
+            }
+        }
     }
 
     protected static function initInject(): void
